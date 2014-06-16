@@ -1,0 +1,331 @@
+<?xml version="1.0"?>
+<!-- Inventory export from IDS Dealership on 12-09-2010 -->
+<Inventory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\WebInventory\WebInventoryExtract.xsd">
+   <Unit rec_id="999*3698A">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1440</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>JAYCO</manufacturer>
+      <brand>EAGLE</brand>
+      <model>SUPER LITE</model>
+      <model_year>2011</model_year>
+      <type_code>FW</type_code>
+      <type>FIFTH WHEEL</type>
+      <status_code>A</status_code>
+      <status>SOLD</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SHS</lot_location_code>
+      <lot_location>SHERKSTON SHORES</lot_location>
+      <style>Pic(s) NoInt AT</style>
+      <interior_color>BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>29&apos; 2&quot;</length>
+      <base_list>30550.00</base_list>
+      <factory_list>30550.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>30550</total_list>
+      <special_web_price>26000.00</special_web_price>
+      <chassis_no>2N9PLPPT014408027</chassis_no>
+      <serial_no>2N9PLPPT014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20060999</received_date>
+   </Unit>
+   <Unit rec_id="999*4361">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1441</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>KEYSTONE</manufacturer>
+      <brand>RAPTOR</brand>
+      <model>297SE</model>
+      <model_year>2011</model_year>
+      <type_code>TH</type_code>
+      <type>TOY HAULER</type>
+      <status_code>A</status_code>
+      <status>AVAILABLE</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>OFF</lot_location_code>
+      <lot_location>OFF LOT PROMO</lot_location>
+      <interior_color>BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>29&apos; 2&quot;</length>
+      <base_list>40309.00</base_list>
+      <factory_list>40309.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <total_list>0</total_list>
+      <special_web_price>25995.00</special_web_price>
+      <chassis_no>2AVUBB1A014408027</chassis_no>
+      <serial_no>2AVUBB1A014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20061019</received_date>
+   </Unit>
+   <Unit rec_id="999*4604">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1442</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>WINNEBAGO</manufacturer>
+      <brand>ASPECT</brand>
+      <model>28B</model>
+      <model_year>2011</model_year>
+      <type_code>TT</type_code>
+      <type>TRAVEL TRAILER</type>
+      <status_code>A</status_code>
+      <status>AVAILABLE</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>29&apos; 7&quot;</length>
+      <mileage>154</mileage>
+      <base_list>69995.00</base_list>
+      <factory_list>69995.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>104793</total_list>
+      <special_web_price>76995.00</special_web_price>
+      <chassis_no>1FTPW145014408027</chassis_no>
+      <serial_no>1FTPW145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+   <Unit rec_id="999*4604">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1443</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>JAYCO</manufacturer>
+      <brand>JAY FLIGHT</brand>
+      <model>SWIFT</model>
+      <model_year>2011</model_year>
+      <type_code>TT</type_code>
+      <type>TRAVEL TRAILER</type>
+      <status_code>O</status_code>
+      <status>ON ORDER</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>16&apos; 6&quot;</length>
+      <mileage>0</mileage>
+      <base_list>8929.00</base_list>
+      <factory_list>8929.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>15900</total_list>
+      <special_web_price>8500.00</special_web_price>
+      <chassis_no>1FTJW145014408027</chassis_no>
+      <serial_no>1FTJW145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+   <Unit rec_id="999*4604">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1444</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>JAYCO</manufacturer>
+      <brand>PINNACLE</brand>
+      <model>31RLTS</model>
+      <model_year>2011</model_year>
+      <type_code>FW</type_code>
+      <type>FIFTH WHEEL</type>
+      <status_code>A</status_code>
+      <status>AVAILABLE</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>34&apos; 9&quot;</length>
+      <mileage>0</mileage>
+      <base_list>56986.00</base_list>
+      <factory_list>48521.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>56986</total_list>
+      <special_web_price>44000.00</special_web_price>
+      <chassis_no>1FTPR145014408027</chassis_no>
+      <serial_no>1FTPR145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+   <Unit rec_id="999*4605">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1445</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>JAYCO</manufacturer>
+      <brand>PINNACLE</brand>
+      <model>31RLTS</model>
+      <model_year>2011</model_year>
+      <type_code>FW</type_code>
+      <type>FIFTH WHEEL</type>
+      <status_code>A</status_code>
+      <status>AVAILABLE</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>34&apos; 9&quot;</length>
+      <mileage>0</mileage>
+      <base_list>56986.00</base_list>
+      <factory_list>48521.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>56986</total_list>
+      <special_web_price>44000.00</special_web_price>
+      <chassis_no>1FTPR145014408027</chassis_no>
+      <serial_no>1FTPR145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+   <Unit rec_id="999*4606">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1446</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>DEVILLE</manufacturer>
+      <brand>RATIONAL</brand>
+      <model>2012-LT</model>
+      <model_year>2012</model_year>
+      <type_code>FW</type_code>
+      <type>FIFTH WHEEL</type>
+      <status_code>A</status_code>
+      <status>AVAILABLE</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>34&apos; 9&quot;</length>
+      <mileage>0</mileage>
+      <base_list>56986.00</base_list>
+      <factory_list>48521.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>56986</total_list>
+      <special_web_price>44000.00</special_web_price>
+      <chassis_no>1FTPR145014408027</chassis_no>
+      <serial_no>1FTPR145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+   <Unit rec_id="999*4606">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1447</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>DEVILLE</manufacturer>
+      <brand>RATIONAL</brand>
+      <model>2012-WOWEE-ZOWEE</model>
+      <model_year>2012</model_year>
+      <type_code>FW</type_code>
+      <type>FIFTH WHEEL</type>
+      <status_code>A</status_code>
+      <status>AVAILABLE</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>34&apos; 9&quot;</length>
+      <mileage>0</mileage>
+      <base_list>56986.00</base_list>
+      <factory_list>48521.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>56986</total_list>
+      <special_web_price>44000.00</special_web_price>
+      <chassis_no>1FTPR145014408027</chassis_no>
+      <serial_no>1FTPR145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+   <Unit rec_id="999*4607">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1448</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>DEVILLE</manufacturer>
+      <brand>RATIONAL</brand>
+      <model>2012-WOWEE-ZOWEE PLOWER DELUXE</model>
+      <model_year>2012</model_year>
+      <type_code>FW</type_code>
+      <type>FIFTH WHEEL</type>
+      <status_code>A</status_code>
+      <status>AVAILABLE</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>34&apos; 9&quot;</length>
+      <mileage>0</mileage>
+      <base_list>56986.00</base_list>
+      <factory_list>48521.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>56986</total_list>
+      <special_web_price>44000.00</special_web_price>
+      <chassis_no>1FTPR145014408027</chassis_no>
+      <serial_no>1FTPR145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+  <Unit rec_id="999*4607">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1466</stock_number>
+      <designation_code>N</designation_code>
+      <designation>NEW</designation>
+      <manufacturer>DEVILLE</manufacturer>
+      <brand>RATIONAL</brand>
+      <model>2012 RATIONAL</model>
+      <model_year>2012</model_year>
+      <type_code>FW</type_code>
+      <type>FIFTH WHEEL</type>
+      <status_code>A</status_code>
+      <status>SOLD</status>
+      <gl_location_code>SRV</gl_location_code>
+      <lot_location_code>SRV</lot_location_code>
+      <lot_location>IDS Dealership</lot_location>
+      <style>PA</style>
+      <interior_color>LT BEIGE</interior_color>
+      <exterior_color>WHITE</exterior_color>
+      <length>34&apos; 9&quot;</length>
+      <mileage>0</mileage>
+      <base_list>56986.00</base_list>
+      <factory_list>48521.00</factory_list>
+      <pdi_list>0.00</pdi_list>
+      <freight_list>0.00</freight_list>
+      <total_list>56986</total_list>
+      <special_web_price>44006.00</special_web_price>
+      <chassis_no>1FTPR145014408027</chassis_no>
+      <serial_no>1FTPR145014408027</serial_no>
+      <take_price>0.00</take_price>
+      <show_web_price></show_web_price>
+      <received_date>20070504</received_date>
+   </Unit>
+</Inventory>
+
