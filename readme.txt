@@ -14,6 +14,10 @@ Import XML feed data into database for Automotive Theme.
 
 Plugin runs every 10 minutes and import XML feed data into database. When importing data from feed, it searches if stock number (from feed) is associated with any listing (post). If not, it will create a new listing and associate the data from feed with listing by mapping stock number to post id. If it finds the association, it will update the data. It also displays the imported data on edit screen of listing.
 
+= Demo =
+
+You can see the working demo of plugin at http://automotive.site.bz
+
 = Test Cases =
 
 *	Typical case: Plugin runs every 10 minutes and load the XML feed, and update the listings against each unit from feed. If feed contains any unit for which it cannot find associated listing, it will create a new listing and then update data for it.
