@@ -1,4 +1,4 @@
-=== Automotiv Vehicle Inventory Feed Import ===
+=== Automotive Feed Importer ===
 Contributors: jawaid
 Donate link: http://www.ibexofts.tk
 Tags: automotiv, auto, vehicle, inventory, feed, import, 
@@ -25,9 +25,9 @@ You can see the working demo of plugin at http://automotive.site.bz
 o	When there are no listings: It will create a new list against each unit imported from feed.
 o	When there are already some listings: Typically, there will not be any unit added to listings, in this case it will create new listing for each of the unit. If one needs to associate the units with existing listing, then it requires manual intervention either doing it by hand or by some custom script.
 
-= Comments =
+= Future Development =
 
-There is still plenty of room for enhancement and optimization in this plugin as few things have been done by making assumptions. Enhancements/optimizations that we can do are:
+There is still plenty of room for enhancement and optimization in this plugin as few things have been done by making assumptions. Enhancements/optimizations that we plan to do are:
 1)	Currently the XML feed path is hardcoded to be picked from /wp-content/plugins/automotive-feed-import/ folder, which is root of this plugin. Folder name for plugin can be anything, it will pick automatically, but file should be present in this plugins root folder. For this, new options/settings page can be created for plugin so user can specify custom path to pick the XML feed from.
 2)	At the moment, when creating new listing it sets the 
 a)	Post title as manufacturer and brand concatenated, and
@@ -55,14 +55,16 @@ No, not yet. Plugin is free and support is also free at the moment. Donations ar
 
 == Screenshots ==
 
-1. Fields added in Admin section.
+1. Fields added in Admin section of custom post type of Automobile Listing after import from XML feed.
 
 == Changelog ==
 
+= 1.0 =
+* Released and synced with GitHub at https://github.com/mjawaids/automotive-feed-import.
 = 0.1 =
 * First version release.
 
 == Upgrade Notice ==
 
-= 0.1 =
-This is first version of plugin. No upgrades required.
+= 1.0 =
+Compatible with first version v0.1.
