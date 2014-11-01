@@ -1,14 +1,14 @@
-=== Automotive Feed Importer ===
+=== Automotiv Vehicle Inventory Feed Import ===
 Contributors: jawaid
-Donate link: http://www.ibexoft.com/
-Tags: feed, import, automotive
+Donate link: http://www.ibexofts.tk
+Tags: automotiv, auto, vehicle, inventory, feed, import, 
 Requires at least: 3.0.1
 Tested up to: 4.0
-Stable tag: 0.1
+Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Import XML feed data into database for Automotive Theme.
+Import Vehicle Inventory from XML feed into database for Automotiv Theme.
 
 == Description ==
 
