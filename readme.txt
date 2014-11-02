@@ -1,4 +1,4 @@
-=== Automotive Feed Importer ===
+=== Automotiv Vehicle Inventory Feed Import ===
 Contributors: jawaid
 Donate link: http://www.ibexofts.tk
 Tags: automotiv, auto, vehicle, inventory, feed, import
@@ -50,7 +50,7 @@ When importing data, plugin does not touch the data already provided by the them
 
 = Does it have a paid version? =
 
-No, not yet. Plugin is free and support is also free at the moment. Donations are appreciated though.
+No. Plugin is free and support is also free at the moment. Donations are appreciated though.
 
 
 == Screenshots ==
