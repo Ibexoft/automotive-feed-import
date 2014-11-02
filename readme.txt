@@ -1,7 +1,7 @@
 === Automotive Feed Importer ===
 Contributors: jawaid
 Donate link: http://www.ibexofts.tk
-Tags: automotiv, auto, vehicle, inventory, feed, import, 
+Tags: automotiv, auto, vehicle, inventory, feed, import
 Requires at least: 3.0.1
 Tested up to: 4.0
 Stable tag: 1.0
