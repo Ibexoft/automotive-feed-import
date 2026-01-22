@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Automotive Feed Import Plugin
-Plugin URI: http://www.ibexoft.com/product/automotive-feed-import/
+Plugin URI: https://www.ibexoft.com/product/automotive-feed-import/
 Description: Imports vehicle data from XML feed into database for Automotive theme. It checks the XML feed every 10 minutes and add/update the data in database. This imported data is then displayed in every listing edit screen.
 Version: 0.1
 Author: Muhammad Jawaid Shamshad
-Author URI: http://www.ibexoft.com
+Author URI: https://www.ibexoft.com
 License: GNU Public License
 */
 

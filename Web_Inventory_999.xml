@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!-- Inventory export from IDS Dealership on 12-09-2010 -->
-<Inventory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\WebInventory\WebInventoryExtract.xsd">
+<Inventory xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\WebInventory\WebInventoryExtract.xsd">
    <Unit rec_id="999*3698A">
       <web_dealer_id>999</web_dealer_id>
       <stock_number>1440</stock_number>
