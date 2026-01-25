@@ -1,0 +1,35 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/wp-admin/options-general.php?page=automotive-feed-import",
+  "preferredVersions": {
+    "php": "8.0",
+    "wp": "latest"
+  },
+  "phpExtensionBundles": [
+    "kitchen-sink"
+  ],
+  "features": {
+    "networking": true
+  },
+  "steps": [
+    {
+      "step": "login",
+      "username": "admin",
+      "password": "password"
+    },
+    {
+      "step": "installPlugin",
+      "pluginZipFile": {
+        "resource": "wordpress.org/plugins",
+        "slug": "automotive-feed-import"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php require_once 'wordpress/wp-load.php'; wp_insert_post(array('post_title' => '2011 JAYCO EAGLE', 'post_content' => 'NEW JAYCO EAGLE SUPER LITE 2011', 'post_type' => 'vehicles', 'post_status' => 'publish', 'meta_input' => array('stock_number' => '1440', 'manufacturer' => 'JAYCO', 'brand' => 'EAGLE', 'model' => 'SUPER LITE', 'model_year' => '2011', 'designation' => 'NEW', 'type' => 'FIFTH WHEEL', 'mileage' => '0', 'exterior_color' => 'WHITE', 'length' => '29\\' 2\"', 'special_web_price' => '26000.00', 'status' => 'AVAILABLE'))); wp_insert_post(array('post_title' => '2011 KEYSTONE RAPTOR', 'post_content' => 'NEW KEYSTONE RAPTOR 297SE 2011', 'post_type' => 'vehicles', 'post_status' => 'publish', 'meta_input' => array('stock_number' => '1441', 'manufacturer' => 'KEYSTONE', 'brand' => 'RAPTOR', 'model' => '297SE', 'model_year' => '2011', 'designation' => 'NEW', 'type' => 'TOY HAULER', 'mileage' => '0', 'exterior_color' => 'SILVER', 'length' => '32\\' 6\"', 'special_web_price' => '34500.00', 'status' => 'AVAILABLE')));"
+    }
+  ]
+}

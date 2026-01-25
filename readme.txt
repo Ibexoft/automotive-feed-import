@@ -1,69 +1,169 @@
-=== Automotiv Vehicle Inventory Feed Import ===
+=== Automotive Vehicle Inventory Feed Import ===
 Contributors: jawaid
 Donate link: https://www.ibexoft.com
-Tags: automotive, vehicle, inventory, feed, import
-Requires at least: 3.0.1
+Tags: automotive, vehicle, inventory, feed, dealership
+Requires at least: 5.0
 Tested up to: 6.9
+Requires PHP: 8.0
 Stable tag: trunk
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Import Vehicle Inventory from XML feed into database for Automotiv Theme.
+Import vehicle inventory from XML feeds into WordPress. Features configurable imports, custom post types, and fully editable vehicle data.
 
 == Description ==
 
-Plugin runs every 10 minutes and import XML feed data into database. When importing data from feed, it searches if stock number (from feed) is associated with any listing (post). If not, it will create a new listing and associate the data from feed with listing by mapping stock number to post id. If it finds the association, it will update the data. It also displays the imported data on edit screen of listing.
+**🎯 Help Shape the Future of This Plugin!**  
+We're constantly improving and your feedback is invaluable. Take our [quick 2-minute survey](https://forms.gle/qEneb8ZeBxnFXuV78) to tell us what features you need, report issues, or suggest improvements. Your input directly influences our development roadmap!
 
-= Test Cases =
+Automotive Feed Import Plugin imports vehicle inventory from XML feeds into a custom "vehicles" post type. This modern, PHP 8-compatible plugin offers full customization through an intuitive settings page.
 
-*	Typical case: Plugin runs every 10 minutes and load the XML feed, and update the listings against each unit from feed. If feed contains any unit for which it cannot find associated listing, it will create a new listing and then update data for it.
-*	First time load:
-o	When there are no listings: It will create a new list against each unit imported from feed.
-o	When there are already some listings: Typically, there will not be any unit added to listings, in this case it will create new listing for each of the unit. If one needs to associate the units with existing listing, then it requires manual intervention either doing it by hand or by some custom script.
+= Key Features =
 
-= Future Development =
+* **Custom Post Type**: Creates a dedicated "vehicles" post type with car icon in dashboard
+* **Configurable Import Schedule**: Choose from multiple frequencies (5/10/15/30 minutes, hourly, daily)
+* **Customizable Post Formats**: Use token-based templates for titles and content (e.g., `{manufacturer} {brand} {model_year}`)
+* **File Browser UI**: Select XML feed files through an intuitive server file browser
+* **Error Logging**: Comprehensive logging system with viewable/clearable logs in admin
+* **Editable Vehicle Data**: All imported fields are fully editable in WordPress admin
+* **Manual Import Trigger**: Run imports on-demand from settings page
+* **Backward Compatible**: Maintains compatibility with old plugin field structure
 
-There is still plenty of room for enhancement and optimization in this plugin as few things have been done by making assumptions. Enhancements/optimizations that we plan to do are:
+= How It Works =
 
-1.	Currently the XML feed path is hardcoded to be picked from /wp-content/plugins/automotive-feed-import/ folder, which is root of this plugin. Folder name for plugin can be anything, it will pick automatically, but file should be present in this plugins root folder. For this, new options/settings page can be created for plugin so user can specify custom path to pick the XML feed from.
-2.	At the moment, when creating new listing it sets the 
-a.	Post title as manufacturer and brand concatenated, and
-b.	Post content as designation, manufacturer, brand, model, and model year concatenated
-This can be modified and further information can be set after clarifying, finalizing, and discussing requirements in detail.
-3.	Following fields in XML feed are also made available by the theme in same or some other manner:
-a.	Manufacturer
-b.	Year
-c.	Price
-d.	Mileage
-e.	Color
+1. Plugin runs on a scheduled basis (configurable frequency)
+2. Loads XML feed and parses vehicle data
+3. Matches vehicles by stock number to existing posts
+4. Creates new vehicle posts or updates existing ones
+5. Stores all XML fields as post metadata
+6. Logs all operations with detailed error reporting
 
-When importing data, plugin does not touch the data already provided by the theme, instead it adds data resulting in some redundant information. And, when creating new listing it copies the same value from feed into these fields. Again, this can be modified after clarifying, finalizing, and discussing requirements in detail.
+= Token-Based Templates =
+
+Customize how vehicle posts are created using tokens from your XML feed:
+
+**Example Title**: `{manufacturer} {brand} {model_year}`  
+**Example Content**: `{designation} {manufacturer} {brand} {model} - {special_web_price}`
+
+Available tokens include: manufacturer, brand, model, model_year, stock_number, designation, special_web_price, mileage, exterior_color, status, and any other fields from your XML feed.
+
+= XML Feed Structure =
+
+The plugin expects an XML feed with the following structure:
+
+`
+<?xml version="1.0"?>
+<Inventory>
+   <Unit rec_id="999*3698A">
+      <web_dealer_id>999</web_dealer_id>
+      <stock_number>1440</stock_number>
+      <designation>NEW</designation>
+      <manufacturer>JAYCO</manufacturer>
+      <brand>EAGLE</brand>
+      <model>SUPER LITE</model>
+      <model_year>2011</model_year>
+      <type>FIFTH WHEEL</type>
+      <status>AVAILABLE</status>
+      <exterior_color>WHITE</exterior_color>
+      <mileage>12000</mileage>
+      <length>29' 2"</length>
+      <special_web_price>26000.00</special_web_price>
+      <!-- Additional fields supported -->
+   </Unit>
+   <!-- More Unit entries -->
+</Inventory>
+`
+
+* Root element: `<Inventory>`
+* Child elements: Multiple `<Unit>` entries
+* Required field: `stock_number` (used for matching/updating)
+* Common fields: manufacturer, brand, model, model_year, special_web_price, status, etc.
+* Download a sample XML file from the plugin settings page
 
 == Installation ==
 
-1. Upload `automotive-feed-import` folder to the `/wp-content/plugins/` directory
+1. Upload `automotive-feed-import` folder to `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Navigate to Settings → Automotive Feed Import
+4. Configure your XML feed path and import settings
+5. Save settings and run your first import
 
 == Frequently Asked Questions ==
 
-= Does it have a paid version? =
+= Where do I configure the plugin? =
 
-No, not yet. Plugin is free and support is also free at the moment. Donations are appreciated though.
+Navigate to Settings → Automotive Feed Import in your WordPress admin panel.
+
+= How do I set the XML feed path? =
+
+Use the file browser button on the settings page to navigate your server and select the XML file, or enter the full server path manually.
+
+= Can I customize how vehicle posts are created? =
+
+Yes! Use the token-based template system to customize post titles and content. Any field from your XML feed can be used as a token.
+
+= How often does the import run? =
+
+You can configure the frequency in settings. Options include every 5, 10, 15, 30 minutes, hourly, twice daily, or daily. Note: Frequency changes require plugin deactivation/reactivation.
+
+= Can I edit the imported vehicle data? =
+
+Yes! All imported fields are fully editable in the vehicle post edit screen.
+
+= What happens to existing Automotive Theme listings? =
+
+On first activation, the plugin automatically migrates any existing 'listing' posts to the new 'vehicles' post type.
+
+= How do I troubleshoot import issues? =
+
+Check the import log on the settings page for detailed error messages. You can also use the "Run Import Now" button to test imports manually.
+
+= Does it support custom XML fields? =
+
+Yes! The plugin automatically imports all fields from your XML feed as post metadata.
+
+= Does it have a paid or pro version? =
+
+Pro version is under development and your feedback is very important. Please, participate in the survey to shape the future of the plugin.
 
 == Screenshots ==
 
-1. Fields added in Admin section of custom post type of Automobile Listing after import from XML feed.
+1. Settings page with XML path, frequency, and template configuration
+2. Vehicle edit screen showing imported and editable fields
+3. Import log viewer with detailed operation history
 
 == Changelog ==
 
-= 1.1 =
-* Tested up to WordPress v6.9.
-= 1.0 =
-* Released and synced with GitHub at https://github.com/mjawaids/automotive-feed-import.
+= 2.0 =
+* Added sample XML download from settings page
+* Added detailed import success/failure notifications
+* Added vehicle data display on frontend
+* Added Settings link on plugins page
+* Added sample XML structure in readme
+* Improved SQL injection protection (all queries use prepared statements)
+* Added blueprint.json for WordPress Playground live previews
+* Enhanced error messaging and logging
+* Improved user experience with better notifications
+* Complete rewrite for PHP 8 compatibility
+* Added custom 'vehicles' post type (replaces 'listing')
+* Added comprehensive settings page (Settings → Automotive Feed Import)
+* Added configurable import frequency
+* Added token-based post title/content templates
+* Added file browser UI for XML path selection
+* Added error logging and display system
+* Added manual import trigger
+* Added dismissible feedback/survey banners
+* Made all vehicle fields editable and saveable
+* Improved security with proper nonces and escaping
+* Automatic migration from old 'listing' post type
+
 = 0.1 =
-* First version release.
+* Initial release
+* Basic XML import functionality
+* Hardcoded 10-minute schedule
+* Read-only field display
 
 == Upgrade Notice ==
 
-= 1.1 =
-Compatible with first version v0.1.
+= 2.0 =
+Major update with PHP 8 compatibility, custom post type, full settings page, and editable fields. Existing listings will be automatically migrated.
