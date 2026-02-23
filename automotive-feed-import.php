@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Automotive Feed Import Plugin
+Plugin Name: Automotive Inventory Importer – Sync Car Dealer Feeds
 Plugin URI: https://www.ibexoft.com/product/automotive-feed-import/
-Description: Imports vehicle data from XML feed into custom vehicles post type. Configurable import frequency and customizable post formats.
-Version: 2.0
+Description: Automatically update your car inventory on your website. No manual entry needed. Stop wasting hours uploading cars one by one.
+Version: 2.1
 Author: Muhammad Jawaid Shamshad - Ibexoft
-Author URI: https://www.ibexoft.com
+Author URI: https://ibexoft.com
 License: GNU Public License
 Requires PHP: 8.0
 */
@@ -32,7 +32,7 @@ class AutomotiveFeedImport
 	public function __construct()
 	{
 		// Get settings or use defaults
-		$this->xml_file = $this->get_option('xml_file_path', plugin_dir_path(__FILE__)."Web_Inventory_999.xml");
+		$this->xml_file = $this->get_option('xml_file_path');
 		
 		// Set up log file
 		$upload_dir = wp_upload_dir();
@@ -71,7 +71,7 @@ class AutomotiveFeedImport
 		// Show admin notice for errors
 		if ($is_error) {
 			add_action('admin_notices', function() use ($message) {
-				echo '<div class="notice notice-error is-dismissible"><p><strong>Automotive Feed Import Error:</strong> ' . esc_html($message) . '</p></div>';
+				echo '<div class="notice notice-error is-dismissible"><p><strong>Automotive Inventory Importer Error:</strong> ' . esc_html($message) . '</p></div>';
 			});
 		}
 	}
@@ -155,6 +155,9 @@ class AutomotiveFeedImport
 		
 		// Flush rewrite rules
 		flush_rewrite_rules();
+		
+		// Set activation notice flag
+		set_transient('afi_activation_notice', true, 60 * 60 * 24); // 24 hours
 	}
 	
 	/**
@@ -544,8 +547,8 @@ class AutomotiveFeedImport
 	 */
 	public function add_settings_page() {
 		add_options_page(
-			'Automotive Feed Import Settings',
-			'Automotive Feed Import',
+			'Automotive Inventory Importer Settings',
+			'Automotive Inventory Importer',
 			'manage_options',
 			$this->plugin_slug,
 			array($this, 'render_settings_page')
@@ -633,7 +636,7 @@ class AutomotiveFeedImport
 	 * Render XML path field
 	 */
 	public function render_xml_path_field() {
-		$value = $this->get_option('xml_file_path', plugin_dir_path(__FILE__)."Web_Inventory_999.xml");
+		$value = $this->get_option('xml_file_path');
 		echo '<input type="text" id="afi_xml_file_path" name="' . $this->plugin_slug . '_xml_file_path" value="' . esc_attr($value) . '" class="regular-text" />';
 		echo '<button type="button" class="button" id="afi_browse_file">Browse Server</button>';
 		echo '<p class="description">Full server path to the XML feed file.</p>';
@@ -747,7 +750,7 @@ class AutomotiveFeedImport
 	public function render_settings_page() {
 		?>
 		<div class="wrap">
-			<h1>Automotive Feed Import Settings</h1>
+			<h1>Automotive Inventory Importer Settings</h1>
 			
 			<?php $this->render_feedback_banner(); ?>
 			<?php $this->render_survey_banner(); ?>
@@ -856,7 +859,7 @@ class AutomotiveFeedImport
 		}
 		?>
 		<div class="notice notice-info is-dismissible" data-dismiss-type="feedback">
-			<p><strong>Enjoying Automotive Feed Import?</strong> Please consider leaving a review on the <a href="https://wordpress.org/plugins/automotive-feed-import/" target="_blank">WordPress Plugin Directory</a>. Your feedback helps us improve!</p>
+			<p><strong>Enjoying Automotive Inventory Importer?</strong> Please consider leaving a review on the <a href="https://wordpress.org/plugins/automotive-feed-import/" target="_blank">WordPress Plugin Directory</a>. Your feedback helps us improve!</p>
 		</div>
 		<?php
 	}
@@ -889,6 +892,9 @@ class AutomotiveFeedImport
 			update_user_meta($user_id, 'afi_feedback_dismissed', true);
 		} elseif ($type === 'survey') {
 			update_user_meta($user_id, 'afi_survey_dismissed', true);
+		} elseif ($type === 'activation') {
+			update_user_meta($user_id, 'afi_activation_notice_dismissed', true);
+			delete_transient('afi_activation_notice');
 		}
 		
 		wp_send_json_success();
@@ -1065,6 +1071,7 @@ add_action('admin_init', array($afi, 'add_custom_box'), 1);
 add_action('admin_init', array($afi, 'register_settings'));
 add_action('admin_init', array($afi, 'handle_admin_actions'));
 add_action('admin_menu', array($afi, 'add_settings_page'));
+add_action('admin_notices', array($afi, 'display_activation_notice'));
 add_action('update_xml_event', array($afi, 'update_data'));
 add_action('save_post_vehicles', array($afi, 'save_vehicle_meta'));
 add_action('wp_ajax_afi_dismiss_banner', array($afi, 'dismiss_banner'));
