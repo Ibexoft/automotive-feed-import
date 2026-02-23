@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
  * @author Muhammad Jawaid Shamshad
  *
  */
-class AutomotiveFeedImport 
+class AutomotiveFeedImport
 {
 	private $xml_file;
 	private $log_file;
@@ -63,7 +63,7 @@ class AutomotiveFeedImport
 	private function log($message, $is_error = false) {
 		$timestamp = current_time('mysql');
 		$level = $is_error ? 'ERROR' : 'INFO';
-		$log_entry = "[{$timestamp}] [{$level}] {$message}" . PHP_EOL;
+		$log_entry = '[' . $timestamp . '] [' . $level . '] ' . $message . PHP_EOL;
 		
 		// Write to log file
 		file_put_contents($this->log_file, $log_entry, FILE_APPEND);
@@ -806,53 +806,68 @@ class AutomotiveFeedImport
 			</h2>
 			
 			<div class="afi-tab-content">
-				<?php if ($active_tab === 'general'): ?>
-					<!-- General Settings Tab -->
-					<form method="post" action="options.php">
-						<?php
-						settings_fields($this->plugin_slug . '_settings');
-						?>
-						<table class="form-table">
-							<?php
-							// Manually render general settings fields
-							do_settings_fields($this->plugin_slug, 'afi_general_section');
-							?>
-						</table>
-						<?php submit_button(); ?>
-						<p>
-							<button type="button" class="button" onclick="if(confirm('Test your saved inventory link now?')) { window.location.href='<?php echo esc_url( admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=test_connection&_wpnonce=' . wp_create_nonce('test_connection')) ); ?>'; }">Test Inventory Link</button>
-							<button type="button" class="button button-primary" style="margin-left: 8px;" onclick="if(confirm('Run a fresh import now?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=run_import&_wpnonce=' . wp_create_nonce('run_import')); ?>'; }">Sync Inventory Now</button>
-							<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=download_sample&_wpnonce=' . wp_create_nonce('download_sample')); ?>" class="button" style="margin-left: 8px;">Download Sample Feed</a>
-						</p>
-					</form>
-					
-				<?php elseif ($active_tab === 'format'): ?>
-					<!-- Post Format Tab -->
-					<form method="post" action="options.php">
-						<?php
-						settings_fields($this->plugin_slug . '_settings');
-						?>
-						<h3>How Vehicle Pages Look</h3>
-						<p>Decide how titles and descriptions should be built from your feed fields, using tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>
-						<table class="form-table">
-							<?php
-							// Manually render format settings fields
-							do_settings_fields($this->plugin_slug, 'afi_format_section');
-							?>
-						</table>
-						<?php submit_button(); ?>
-					</form>
-					
-				<?php elseif ($active_tab === 'log'): ?>
-					<!-- Import Log Tab -->
-					<h2>Import History</h2>
-					<div style="background: #f5f5f5; padding: 15px; border: 1px solid #ddd; max-height: 400px; overflow-y: auto; margin-top: 20px;">
-						<?php $this->display_log(); ?>
+				<div class="afi-settings-layout">
+					<div class="afi-settings-main">
+						<?php if ($active_tab === 'general'): ?>
+							<!-- General Settings Tab -->
+							<form method="post" action="options.php">
+								<?php
+								settings_fields($this->plugin_slug . '_settings');
+								?>
+								<table class="form-table">
+									<?php
+									// Manually render general settings fields
+									do_settings_fields($this->plugin_slug, 'afi_general_section');
+									?>
+								</table>
+								<?php submit_button(); ?>
+								<p>
+									<button type="button" class="button" onclick="if(confirm('Test your saved inventory link now?')) { window.location.href='<?php echo esc_url( admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=test_connection&_wpnonce=' . wp_create_nonce('test_connection')) ); ?>'; }">Test Inventory Link</button>
+									<button type="button" class="button button-primary" style="margin-left: 8px;" onclick="if(confirm('Run a fresh import now?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=run_import&_wpnonce=' . wp_create_nonce('run_import')); ?>'; }">Sync Inventory Now</button>
+									<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=download_sample&_wpnonce=' . wp_create_nonce('download_sample')); ?>" class="button" style="margin-left: 8px;">Download Sample Feed</a>
+								</p>
+							</form>
+							
+						<?php elseif ($active_tab === 'format'): ?>
+							<!-- Post Format Tab -->
+							<form method="post" action="options.php">
+								<?php
+								settings_fields($this->plugin_slug . '_settings');
+								?>
+								<h3>How Vehicle Pages Look</h3>
+								<p>Decide how titles and descriptions should be built from your feed fields, using tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>
+								<table class="form-table">
+									<?php
+									// Manually render format settings fields
+									do_settings_fields($this->plugin_slug, 'afi_format_section');
+									?>
+								</table>
+								<?php submit_button(); ?>
+							</form>
+							
+						<?php elseif ($active_tab === 'log'): ?>
+							<!-- Import Log Tab -->
+							<h2>Import History</h2>
+							<div style="background: #f5f5f5; padding: 15px; border: 1px solid #ddd; max-height: 400px; overflow-y: auto; margin-top: 20px;">
+								<?php $this->display_log(); ?>
+							</div>
+							<p style="margin-top: 15px;">
+								<button type="button" class="button" onclick="if(confirm('Clear all saved import history?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=clear_log&_wpnonce=' . wp_create_nonce('clear_log')); ?>'; }">Clear History</button>
+							</p>
+						<?php endif; ?>
 					</div>
-					<p style="margin-top: 15px;">
-						<button type="button" class="button" onclick="if(confirm('Clear all saved import history?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=clear_log&_wpnonce=' . wp_create_nonce('clear_log')); ?>'; }">Clear History</button>
-					</p>
-				<?php endif; ?>
+					<div class="afi-settings-sidebar">
+						<div style="background: #fff; border: 1px solid #ccd0d4; padding: 15px; margin-top: 0; border-left: 4px solid #0073aa;">
+							<h3 style="margin-top: 0;">🚀 Quick Start Guide</h3>
+							<ol>
+								<li><strong>Enter your Inventory Link:</strong> Paste the URL or server path to your XML vehicle feed on the <strong>Feed &amp; Sync</strong> tab.</li>
+								<li><strong>Choose how often to sync:</strong> Pick a schedule that matches how often your provider updates the feed, then click <strong>Save Changes</strong>.</li>
+								<li><strong>Sync &amp; review:</strong> Click <strong>Sync Inventory Now</strong> to run your first import, then review your vehicles under the <strong>Vehicles</strong> menu.</li>
+							</ol>
+							<p><em>Not sure about your link? Check your inventory provider's documentation or portal for your "XML Feed" or "Inventory Export" URL.</em></p>
+						</div>
+					</div>
+				</div>
 			</div>
 			
 			<style>
@@ -865,6 +880,28 @@ class AutomotiveFeedImport
 				}
 				.nav-tab-wrapper {
 					margin-bottom: 0 !important;
+				}
+				.afi-settings-layout {
+					display: flex;
+					gap: 20px;
+					align-items: flex-start;
+					flex-wrap: wrap;
+				}
+				.afi-settings-main {
+					flex: 1 1 0;
+					min-width: 0;
+				}
+				.afi-settings-sidebar {
+					flex: 0 0 280px;
+					max-width: 100%;
+				}
+				@media (max-width: 900px) {
+					.afi-settings-layout {
+						flex-direction: column;
+					}
+					.afi-settings-sidebar {
+						flex: 1 1 auto;
+					}
 				}
 			</style>
 		</div>
