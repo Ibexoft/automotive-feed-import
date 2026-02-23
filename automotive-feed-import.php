@@ -748,6 +748,8 @@ class AutomotiveFeedImport
 	 * Render settings page
 	 */
 	public function render_settings_page() {
+		// Get active tab from URL or default to 'general'
+		$active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
 		?>
 		<div class="wrap">
 			<h1>Automotive Inventory Importer Settings</h1>
@@ -755,25 +757,72 @@ class AutomotiveFeedImport
 			<?php $this->render_feedback_banner(); ?>
 			<?php $this->render_survey_banner(); ?>
 			
-			<form method="post" action="options.php">
-				<?php
-				settings_fields($this->plugin_slug . '_settings');
-				do_settings_sections($this->plugin_slug);
-				submit_button();
-				?>
-			</form>
+			<!-- Tab Navigation -->
+			<h2 class="nav-tab-wrapper">
+				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=general" class="nav-tab <?php echo $active_tab === 'general' ? 'nav-tab-active' : ''; ?>">General Settings</a>
+				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=format" class="nav-tab <?php echo $active_tab === 'format' ? 'nav-tab-active' : ''; ?>">Post Format</a>
+				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=log" class="nav-tab <?php echo $active_tab === 'log' ? 'nav-tab-active' : ''; ?>">Import Log</a>
+			</h2>
 			
-			<hr>
-			
-			<h2>Import Log</h2>
-			<div style="background: #f5f5f5; padding: 15px; border: 1px solid #ddd; max-height: 400px; overflow-y: auto;">
-				<?php $this->display_log(); ?>
+			<div class="afi-tab-content">
+				<?php if ($active_tab === 'general'): ?>
+					<!-- General Settings Tab -->
+					<form method="post" action="options.php">
+						<?php
+						settings_fields($this->plugin_slug . '_settings');
+						?>
+						<table class="form-table">
+							<?php
+							// Manually render general settings fields
+							do_settings_fields($this->plugin_slug, 'afi_general_section');
+							?>
+						</table>
+						<?php submit_button(); ?>
+					</form>
+					
+				<?php elseif ($active_tab === 'format'): ?>
+					<!-- Post Format Tab -->
+					<form method="post" action="options.php">
+						<?php
+						settings_fields($this->plugin_slug . '_settings');
+						?>
+						<h3>Post Format Settings</h3>
+						<p>Customize how vehicle posts are formatted. Use tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>
+						<table class="form-table">
+							<?php
+							// Manually render format settings fields
+							do_settings_fields($this->plugin_slug, 'afi_format_section');
+							?>
+						</table>
+						<?php submit_button(); ?>
+					</form>
+					
+				<?php elseif ($active_tab === 'log'): ?>
+					<!-- Import Log Tab -->
+					<h2>Import Log</h2>
+					<div style="background: #f5f5f5; padding: 15px; border: 1px solid #ddd; max-height: 400px; overflow-y: auto; margin-top: 20px;">
+						<?php $this->display_log(); ?>
+					</div>
+					<p style="margin-top: 15px;">
+						<button type="button" class="button" onclick="if(confirm('Are you sure you want to clear the log?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=clear_log&_wpnonce=' . wp_create_nonce('clear_log')); ?>'; }">Clear Log</button>
+						<button type="button" class="button button-primary" onclick="if(confirm('Run import now?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=run_import&_wpnonce=' . wp_create_nonce('run_import')); ?>'; }">Run Import Now</button>
+						<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=download_sample&_wpnonce=' . wp_create_nonce('download_sample')); ?>" class="button" style="margin-left: 10px;">Download Sample XML</a>
+					</p>
+				<?php endif; ?>
 			</div>
-			<p>
-				<button type="button" class="button" onclick="if(confirm('Are you sure you want to clear the log?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=clear_log&_wpnonce=' . wp_create_nonce('clear_log')); ?>'; }">Clear Log</button>
-				<button type="button" class="button button-primary" onclick="if(confirm('Run import now?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=run_import&_wpnonce=' . wp_create_nonce('run_import')); ?>'; }">Run Import Now</button>
-				<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=download_sample&_wpnonce=' . wp_create_nonce('download_sample')); ?>" class="button" style="margin-left: 10px;">Download Sample XML</a>
-			</p>
+			
+			<style>
+				.afi-tab-content {
+					background: #fff;
+					padding: 20px;
+					border: 1px solid #ccd0d4;
+					border-top: none;
+					margin-top: 0;
+				}
+				.nav-tab-wrapper {
+					margin-bottom: 0 !important;
+				}
+			</style>
 		</div>
 		<?php
 	}
@@ -807,6 +856,7 @@ class AutomotiveFeedImport
 		}
 		
 		$action = sanitize_text_field($_GET['action']);
+		$tab = isset($_GET['tab']) ? '&tab=' . sanitize_text_field($_GET['tab']) : '';
 		
 		// Clear log
 		if ($action === 'clear_log' && check_admin_referer('clear_log')) {
@@ -816,7 +866,7 @@ class AutomotiveFeedImport
 					echo '<div class="notice notice-success is-dismissible"><p>Log cleared successfully.</p></div>';
 				});
 			}
-			wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug));
+			wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug . $tab));
 			exit;
 		}
 		
@@ -832,7 +882,7 @@ class AutomotiveFeedImport
 					echo '<div class="notice notice-error is-dismissible"><p><strong>Import Failed!</strong> Check the log below for details.</p></div>';
 				});
 			}
-			wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug));
+			wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug . $tab));
 			exit;
 		}
 		
