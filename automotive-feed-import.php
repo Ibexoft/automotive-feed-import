@@ -778,6 +778,9 @@ class AutomotiveFeedImport
 							?>
 						</table>
 						<?php submit_button(); ?>
+						<p>
+							<button type="button" class="button" onclick="if(confirm('Test the saved feed connection now?')) { window.location.href='<?php echo esc_url( admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=test_connection&_wpnonce=' . wp_create_nonce('test_connection')) ); ?>'; }">Test Connection</button>
+						</p>
 					</form>
 					
 				<?php elseif ($active_tab === 'format'): ?>
@@ -844,6 +847,94 @@ class AutomotiveFeedImport
 	}
 	
 	/**
+	 * Test XML feed connection and show an admin notice
+	 */
+	private function test_connection() {
+		$path = $this->get_option('xml_file_path');
+
+		if (empty($path)) {
+			add_action('admin_notices', function () {
+				echo '<div class="notice notice-error is-dismissible"><p>Please save your feed path first, then click Test Connection again.</p></div>';
+			});
+			return;
+		}
+
+		// Remote URL (http/https)
+		if (preg_match('#^https?://#i', $path)) {
+			$response = wp_remote_get($path, array('timeout' => 15));
+
+			if (is_wp_error($response)) {
+				$message = $response->get_error_message();
+				add_action('admin_notices', function () use ($message) {
+					echo '<div class="notice notice-error is-dismissible"><p>We could not reach your feed URL: ' . esc_html($message) . '.</p></div>';
+				});
+				return;
+			}
+
+			$code = wp_remote_retrieve_response_code($response);
+			if ($code < 200 || $code >= 300) {
+				add_action('admin_notices', function () use ($code) {
+					echo '<div class="notice notice-error is-dismissible"><p>Your feed URL responded, but with an error code: ' . intval($code) . '.</p></div>';
+				});
+				return;
+			}
+
+			$body = wp_remote_retrieve_body($response);
+			if ($body === '') {
+				add_action('admin_notices', function () {
+					echo '<div class="notice notice-error is-dismissible"><p>Your feed URL responded, but the file was empty.</p></div>';
+				});
+				return;
+			}
+
+			libxml_use_internal_errors(true);
+			$xml = simplexml_load_string($body);
+			if ($xml === false) {
+				$errors  = libxml_get_errors();
+				libxml_clear_errors();
+				$first   = reset($errors);
+				$err_msg = $first ? trim($first->message) : 'Unknown XML error.';
+				add_action('admin_notices', function () use ($err_msg) {
+					echo '<div class="notice notice-error is-dismissible"><p>We reached your feed URL, but the XML is not valid: ' . esc_html($err_msg) . '.</p></div>';
+				});
+				return;
+			}
+		} else {
+			// Local file path
+			if (!file_exists($path)) {
+				add_action('admin_notices', function () use ($path) {
+					echo '<div class="notice notice-error is-dismissible"><p>We could not find a feed file at this path: ' . esc_html($path) . '.</p></div>';
+				});
+				return;
+			}
+
+			if (!is_readable($path)) {
+				add_action('admin_notices', function () use ($path) {
+					echo '<div class="notice notice-error is-dismissible"><p>The feed file exists but cannot be read. Please check permissions on: ' . esc_html($path) . '.</p></div>';
+				});
+				return;
+			}
+
+			libxml_use_internal_errors(true);
+			$xml = simplexml_load_file($path);
+			if ($xml === false) {
+				$errors  = libxml_get_errors();
+				libxml_clear_errors();
+				$first   = reset($errors);
+				$err_msg = $first ? trim($first->message) : 'Unknown XML error.';
+				add_action('admin_notices', function () use ($err_msg) {
+					echo '<div class="notice notice-error is-dismissible"><p>We found your feed file, but the XML is not valid: ' . esc_html($err_msg) . '.</p></div>';
+				});
+				return;
+			}
+		}
+
+		add_action('admin_notices', function () {
+			echo '<div class="notice notice-success is-dismissible"><p>Success! We could connect to your feed and read the XML file.</p></div>';
+		});
+	}
+	
+	/**
 	 * Handle admin actions
 	 */
 	public function handle_admin_actions() {
@@ -856,7 +947,13 @@ class AutomotiveFeedImport
 		}
 		
 		$action = sanitize_text_field($_GET['action']);
-		$tab = isset($_GET['tab']) ? '&tab=' . sanitize_text_field($_GET['tab']) : '';
+		$tab    = isset($_GET['tab']) ? '&tab=' . sanitize_text_field($_GET['tab']) : '';
+
+		// Test connection (no redirect so user sees the result immediately)
+		if ($action === 'test_connection' && check_admin_referer('test_connection')) {
+			$this->test_connection();
+			return;
+		}
 		
 		// Clear log
 		if ($action === 'clear_log' && check_admin_referer('clear_log')) {
