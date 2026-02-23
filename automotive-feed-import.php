@@ -161,6 +161,47 @@ class AutomotiveFeedImport
 	}
 	
 	/**
+	 * Display activation notice after plugin is activated
+	 */
+	public function display_activation_notice() {
+		// Only show if activation flag is set
+		if (!get_transient('afi_activation_notice')) {
+			return;
+		}
+
+		// Only show to users who can manage options
+		if (!current_user_can('manage_options')) {
+			return;
+		}
+
+		// If this user already dismissed the notice, do not show again
+		if (get_user_meta(get_current_user_id(), 'afi_activation_notice_dismissed', true)) {
+			return;
+		}
+
+		// Only on Plugins page or Dashboard (guard if get_current_screen not available)
+		if (function_exists('get_current_screen')) {
+			$screen = get_current_screen();
+			if ($screen && $screen->id !== 'plugins' && $screen->id !== 'dashboard') {
+				return;
+			}
+		}
+
+		?>
+		<div class="notice notice-info is-dismissible" data-dismiss-type="activation">
+			<p style="font-size: 16px;">
+				<strong>Automotive Inventory Importer is ready!</strong>
+				Ready to see your cars on your site?
+				<a href="<?php echo esc_url( admin_url('options-general.php?page=' . $this->plugin_slug) ); ?>"
+				   class="button button-primary" style="margin-left: 10px;">
+					Start Your First Import
+				</a>
+			</p>
+		</div>
+		<?php
+	}
+	
+	/**
 	 * Uninitialize plugin
 	 */
 	public function uninit()
