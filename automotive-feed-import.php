@@ -609,7 +609,7 @@ class AutomotiveFeedImport
 		// General Settings Section
 		add_settings_section(
 			'afi_general_section',
-			'General Settings',
+			'Feed & Sync Settings',
 			array($this, 'render_general_section'),
 			$this->plugin_slug
 		);
@@ -617,7 +617,7 @@ class AutomotiveFeedImport
 		// XML File Path
 		add_settings_field(
 			'xml_file_path',
-			'XML Feed File Path',
+			'Your Inventory Link',
 			array($this, 'render_xml_path_field'),
 			$this->plugin_slug,
 			'afi_general_section'
@@ -626,7 +626,7 @@ class AutomotiveFeedImport
 		// Import Frequency
 		add_settings_field(
 			'import_frequency',
-			'Import Frequency',
+			'How Often to Sync',
 			array($this, 'render_frequency_field'),
 			$this->plugin_slug,
 			'afi_general_section'
@@ -635,7 +635,7 @@ class AutomotiveFeedImport
 		// Post Format Section
 		add_settings_section(
 			'afi_format_section',
-			'Post Format Settings',
+			'How Vehicle Pages Look',
 			array($this, 'render_format_section'),
 			$this->plugin_slug
 		);
@@ -643,7 +643,7 @@ class AutomotiveFeedImport
 		// Post Title Format
 		add_settings_field(
 			'post_title_format',
-			'Post Title Format',
+			'Vehicle Page Title Template',
 			array($this, 'render_title_format_field'),
 			$this->plugin_slug,
 			'afi_format_section'
@@ -652,7 +652,7 @@ class AutomotiveFeedImport
 		// Post Content Format
 		add_settings_field(
 			'post_content_format',
-			'Post Content Format',
+			'Vehicle Description Template',
 			array($this, 'render_content_format_field'),
 			$this->plugin_slug,
 			'afi_format_section'
@@ -663,14 +663,14 @@ class AutomotiveFeedImport
 	 * Render general section description
 	 */
 	public function render_general_section() {
-		echo '<p>Configure XML feed import settings.</p>';
+		echo '<p>Tell us where your inventory feed lives and how often to sync it.</p>';
 	}
 	
 	/**
 	 * Render format section description
 	 */
 	public function render_format_section() {
-		echo '<p>Customize how vehicle posts are formatted. Use tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>';
+		echo '<p>Control how vehicle titles and descriptions are built using tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>';
 	}
 	
 	/**
@@ -680,7 +680,7 @@ class AutomotiveFeedImport
 		$value = $this->get_option('xml_file_path');
 		echo '<input type="text" id="afi_xml_file_path" name="' . $this->plugin_slug . '_xml_file_path" value="' . esc_attr($value) . '" class="regular-text" />';
 		echo '<button type="button" class="button" id="afi_browse_file">Browse Server</button>';
-		echo '<p class="description">Paste the full server path to your vehicle feed file here, or click Browse Server to find it.</p>';
+		echo '<p class="description">Paste the full URL or server path to your inventory XML feed, or click Browse Server to locate the file on this site.</p>';
 		?>
 		<script type="text/javascript">
 		jQuery(document).ready(function($) {
@@ -764,7 +764,7 @@ class AutomotiveFeedImport
 			echo '<option value="' . esc_attr($key) . '" ' . $selected . '>' . esc_html($label) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">Choose how often WordPress checks your feed for new vehicles; if you change this later, you must deactivate and reactivate the plugin.</p>';
+		echo '<p class="description">Choose how often we should check your feed for new or updated vehicles. If you change this later, deactivate and reactivate the plugin to apply the new schedule.</p>';
 	}
 	
 	/**
@@ -773,7 +773,7 @@ class AutomotiveFeedImport
 	public function render_title_format_field() {
 		$value = $this->get_option('post_title_format', '{manufacturer} {brand}');
 		echo '<input type="text" name="' . $this->plugin_slug . '_post_title_format" value="' . esc_attr($value) . '" class="regular-text" />';
-		echo '<p class="description">Type how you want the vehicle post title to look, using tokens like {manufacturer} and {model_year}.</p>';
+		echo '<p class="description">Set the pattern for your vehicle page titles. Example: {manufacturer} {brand} {model_year}. Use any field from your feed inside {curly_braces}.</p>';
 	}
 	
 	/**
@@ -782,7 +782,7 @@ class AutomotiveFeedImport
 	public function render_content_format_field() {
 		$value = $this->get_option('post_content_format', '{designation} {manufacturer} {brand} {model} {model_year}');
 		echo '<textarea name="' . $this->plugin_slug . '_post_content_format" class="large-text" rows="3">' . esc_textarea($value) . '</textarea>';
-		echo '<p class="description">Type how you want the main vehicle description to look, using tokens like {designation}, {manufacturer}, and {model}.</p>';
+		echo '<p class="description">Write the default description for each vehicle using tokens such as {designation}, {manufacturer}, {brand}, {model}, {model_year}, etc.</p>';
 	}
 	
 	/**
@@ -800,9 +800,9 @@ class AutomotiveFeedImport
 			
 			<!-- Tab Navigation -->
 			<h2 class="nav-tab-wrapper">
-				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=general" class="nav-tab <?php echo $active_tab === 'general' ? 'nav-tab-active' : ''; ?>">General Settings</a>
-				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=format" class="nav-tab <?php echo $active_tab === 'format' ? 'nav-tab-active' : ''; ?>">Post Format</a>
-				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=log" class="nav-tab <?php echo $active_tab === 'log' ? 'nav-tab-active' : ''; ?>">Import Log</a>
+				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=general" class="nav-tab <?php echo $active_tab === 'general' ? 'nav-tab-active' : ''; ?>">Feed & Sync</a>
+				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=format" class="nav-tab <?php echo $active_tab === 'format' ? 'nav-tab-active' : ''; ?>">Page Templates</a>
+				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=log" class="nav-tab <?php echo $active_tab === 'log' ? 'nav-tab-active' : ''; ?>">Import History</a>
 			</h2>
 			
 			<div class="afi-tab-content">
@@ -820,7 +820,7 @@ class AutomotiveFeedImport
 						</table>
 						<?php submit_button(); ?>
 						<p>
-							<button type="button" class="button" onclick="if(confirm('Test the saved feed connection now?')) { window.location.href='<?php echo esc_url( admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=test_connection&_wpnonce=' . wp_create_nonce('test_connection')) ); ?>'; }">Test Connection</button>
+							<button type="button" class="button" onclick="if(confirm('Test your saved inventory link now?')) { window.location.href='<?php echo esc_url( admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=test_connection&_wpnonce=' . wp_create_nonce('test_connection')) ); ?>'; }">Test Inventory Link</button>
 						</p>
 					</form>
 					
@@ -830,8 +830,8 @@ class AutomotiveFeedImport
 						<?php
 						settings_fields($this->plugin_slug . '_settings');
 						?>
-						<h3>Post Format Settings</h3>
-						<p>Customize how vehicle posts are formatted. Use tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>
+						<h3>How Vehicle Pages Look</h3>
+						<p>Decide how titles and descriptions should be built from your feed fields, using tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>
 						<table class="form-table">
 							<?php
 							// Manually render format settings fields
@@ -843,14 +843,14 @@ class AutomotiveFeedImport
 					
 				<?php elseif ($active_tab === 'log'): ?>
 					<!-- Import Log Tab -->
-					<h2>Import Log</h2>
+					<h2>Import History</h2>
 					<div style="background: #f5f5f5; padding: 15px; border: 1px solid #ddd; max-height: 400px; overflow-y: auto; margin-top: 20px;">
 						<?php $this->display_log(); ?>
 					</div>
 					<p style="margin-top: 15px;">
-						<button type="button" class="button" onclick="if(confirm('Are you sure you want to clear the log?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=clear_log&_wpnonce=' . wp_create_nonce('clear_log')); ?>'; }">Clear Log</button>
-						<button type="button" class="button button-primary" onclick="if(confirm('Run import now?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=run_import&_wpnonce=' . wp_create_nonce('run_import')); ?>'; }">Run Import Now</button>
-						<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=download_sample&_wpnonce=' . wp_create_nonce('download_sample')); ?>" class="button" style="margin-left: 10px;">Download Sample XML</a>
+						<button type="button" class="button" onclick="if(confirm('Clear all saved import history?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=clear_log&_wpnonce=' . wp_create_nonce('clear_log')); ?>'; }">Clear History</button>
+						<button type="button" class="button button-primary" onclick="if(confirm('Run a fresh import now?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=log&action=run_import&_wpnonce=' . wp_create_nonce('run_import')); ?>'; }">Sync Inventory Now</button>
+						<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=download_sample&_wpnonce=' . wp_create_nonce('download_sample')); ?>" class="button" style="margin-left: 10px;">Download Sample Feed</a>
 					</p>
 				<?php endif; ?>
 			</div>
