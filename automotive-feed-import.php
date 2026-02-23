@@ -639,7 +639,7 @@ class AutomotiveFeedImport
 		$value = $this->get_option('xml_file_path');
 		echo '<input type="text" id="afi_xml_file_path" name="' . $this->plugin_slug . '_xml_file_path" value="' . esc_attr($value) . '" class="regular-text" />';
 		echo '<button type="button" class="button" id="afi_browse_file">Browse Server</button>';
-		echo '<p class="description">Full server path to the XML feed file.</p>';
+		echo '<p class="description">Paste the full server path to your vehicle feed file here, or click Browse Server to find it.</p>';
 		?>
 		<script type="text/javascript">
 		jQuery(document).ready(function($) {
@@ -723,7 +723,7 @@ class AutomotiveFeedImport
 			echo '<option value="' . esc_attr($key) . '" ' . $selected . '>' . esc_html($label) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">Note: Changing frequency requires deactivating and reactivating the plugin.</p>';
+		echo '<p class="description">Choose how often WordPress checks your feed for new vehicles; if you change this later, you must deactivate and reactivate the plugin.</p>';
 	}
 	
 	/**
@@ -732,7 +732,7 @@ class AutomotiveFeedImport
 	public function render_title_format_field() {
 		$value = $this->get_option('post_title_format', '{manufacturer} {brand}');
 		echo '<input type="text" name="' . $this->plugin_slug . '_post_title_format" value="' . esc_attr($value) . '" class="regular-text" />';
-		echo '<p class="description">Example: {manufacturer} {brand} {model_year}</p>';
+		echo '<p class="description">Type how you want the vehicle post title to look, using tokens like {manufacturer} and {model_year}.</p>';
 	}
 	
 	/**
@@ -741,7 +741,7 @@ class AutomotiveFeedImport
 	public function render_content_format_field() {
 		$value = $this->get_option('post_content_format', '{designation} {manufacturer} {brand} {model} {model_year}');
 		echo '<textarea name="' . $this->plugin_slug . '_post_content_format" class="large-text" rows="3">' . esc_textarea($value) . '</textarea>';
-		echo '<p class="description">Example: {designation} {manufacturer} {brand} {model} {model_year}</p>';
+		echo '<p class="description">Type how you want the main vehicle description to look, using tokens like {designation}, {manufacturer}, and {model}.</p>';
 	}
 	
 	/**
