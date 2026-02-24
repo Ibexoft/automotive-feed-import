@@ -1006,6 +1006,11 @@ class AutomotiveFeedImport
 							<form method="post" action="options.php">
 								<?php
 								settings_fields($this->plugin_slug . '_settings');
+								// Hidden fields to preserve format settings when saving general settings
+								$title_format = $this->get_option('post_title_format', '{manufacturer} {brand}');
+								$content_format = $this->get_option('post_content_format', '{designation} {manufacturer} {brand} {model} {model_year}');
+								echo '<input type="hidden" name="' . $this->plugin_slug . '_post_title_format" value="' . esc_attr($title_format) . '" />';
+								echo '<input type="hidden" name="' . $this->plugin_slug . '_post_content_format" value="' . esc_attr($content_format) . '" />';
 								?>
 								<table class="form-table">
 									<?php
@@ -1026,6 +1031,11 @@ class AutomotiveFeedImport
 							<form method="post" action="options.php">
 								<?php
 								settings_fields($this->plugin_slug . '_settings');
+								// Hidden fields to preserve general settings when saving format settings
+								$xml_file_path = $this->get_option('xml_file_path');
+								$import_frequency = $this->get_option('import_frequency', 'tenminute');
+								echo '<input type="hidden" name="' . $this->plugin_slug . '_xml_file_path" value="' . esc_attr($xml_file_path) . '" />';
+								echo '<input type="hidden" name="' . $this->plugin_slug . '_import_frequency" value="' . esc_attr($import_frequency) . '" />';
 								?>
 								<h3>How Vehicle Pages Look</h3>
 								<p>Decide how titles and descriptions should be built from your feed fields, using tokens like {manufacturer}, {brand}, {model}, {model_year}, etc.</p>
