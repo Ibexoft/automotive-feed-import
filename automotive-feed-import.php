@@ -417,34 +417,69 @@ class AutomotiveFeedImport
 	 */
 	public function update_inventory($post_id, $unit)
 	{
-		// loop through each field and update the database
-		foreach ($unit as $key=>$value) 
-		{
-			update_post_meta( $post_id, $key, $value );
+		// Get field mappings
+		$mappings = $this->get_field_mappings();
+		
+		// If no mappings exist, use default behavior (import all fields as-is)
+		if (empty($mappings)) {
+			foreach ($unit as $key => $value) {
+				update_post_meta($post_id, $key, $value);
+				
+				// Maintain backward compatibility with Automotive Theme fields
+				$this->update_theme_compatibility_field($post_id, $key, $value);
+			}
+			return;
+		}
+		
+		// Use mappings to import only enabled fields to their target fields
+		foreach ($unit as $source_field => $value) {
+			// Skip if field not in mappings or not enabled
+			if (!isset($mappings[$source_field]) || !$mappings[$source_field]['enabled']) {
+				continue;
+			}
+			
+			$target_field = $mappings[$source_field]['target'];
+			
+			// Update the target meta field
+			update_post_meta($post_id, $target_field, $value);
+			
+			// Also store with source field name for backward compatibility
+			if ($target_field !== $source_field) {
+				update_post_meta($post_id, $source_field, $value);
+			}
 			
 			// Maintain backward compatibility with Automotive Theme fields
-			switch ($key) 
-			{
-				case 'manufacturer':
-					update_post_meta( $post_id, 'manufacturer_level2_value', $value );
+			$this->update_theme_compatibility_field($post_id, $source_field, $value);
+		}
+	}
+	
+	/**
+	 * Update theme compatibility fields
+	 * @param int $post_id Post ID
+	 * @param string $key Field key
+	 * @param mixed $value Field value
+	 */
+	private function update_theme_compatibility_field($post_id, $key, $value) {
+		switch ($key) {
+			case 'manufacturer':
+				update_post_meta($post_id, 'manufacturer_level2_value', $value);
 				break;
-				
-				case 'model_year':
-					update_post_meta( $post_id, 'year_value', $value );
+			
+			case 'model_year':
+				update_post_meta($post_id, 'year_value', $value);
 				break;
-				
-				case 'special_web_price':
-					update_post_meta( $post_id, 'price_value', $value );
+			
+			case 'special_web_price':
+				update_post_meta($post_id, 'price_value', $value);
 				break;
-				
-				case 'mileage':
-					update_post_meta( $post_id, 'mileage_value', $value );
+			
+			case 'mileage':
+				update_post_meta($post_id, 'mileage_value', $value);
 				break;
-				
-				case 'exterior_color':
-					update_post_meta( $post_id, 'color_value', $value );
+			
+			case 'exterior_color':
+				update_post_meta($post_id, 'color_value', $value);
 				break;
-			}
 		}
 	}
 
@@ -867,6 +902,150 @@ class AutomotiveFeedImport
 	}
 	
 	/**
+	 * Extract available field names from the XML feed
+	 * @return array|false Array of field names on success, false on failure
+	 */
+	public function extract_xml_fields() {
+		if (empty($this->xml_file)) {
+			return false;
+		}
+		
+		// Load XML and get first unit to extract field names
+		$units = $this->load_xml();
+		
+		if ($units === false || empty($units)) {
+			return false;
+		}
+		
+		// Get field names from first unit
+		$first_unit = reset($units);
+		$fields = array_keys($first_unit);
+		
+		return $fields;
+	}
+	
+	/**
+	 * Get available target field options for mapping
+	 * @return array Target fields with labels
+	 */
+	public function get_available_target_fields() {
+		return array(
+			// Core vehicle fields
+			'stock_number' => 'Stock Number',
+			'vin' => 'VIN',
+			'manufacturer' => 'Manufacturer',
+			'brand' => 'Brand',
+			'model' => 'Model',
+			'model_year' => 'Year',
+			'designation' => 'Condition/Designation',
+			'type' => 'Type',
+			'body_type' => 'Body Type',
+			'style' => 'Style',
+			
+			// Pricing fields
+			'special_web_price' => 'Special Web Price',
+			'base_list' => 'Base List Price',
+			'factory_list' => 'Factory List Price',
+			'total_list' => 'Total List Price',
+			'take_price' => 'Take Price',
+			'show_web_price' => 'Show Web Price',
+			
+			// Physical attributes
+			'mileage' => 'Mileage',
+			'exterior_color' => 'Exterior Color',
+			'interior_color' => 'Interior Color',
+			'length' => 'Length',
+			'width' => 'Width',
+			'height' => 'Height',
+			'weight' => 'Weight',
+			
+			// Identification
+			'chassis_no' => 'Chassis Number',
+			'serial_no' => 'Serial Number',
+			
+			// Status and location
+			'status' => 'Status',
+			'status_code' => 'Status Code',
+			'lot_location' => 'Lot Location',
+			'lot_location_code' => 'Lot Location Code',
+			'gl_location_code' => 'GL Location Code',
+			
+			// Dates
+			'received_date' => 'Received Date',
+			'sold_date' => 'Sold Date',
+			
+			// Other
+			'web_dealer_id' => 'Web Dealer ID',
+			'description' => 'Description',
+			'features' => 'Features',
+			'options' => 'Options',
+			'notes' => 'Notes',
+			
+			// Compatibility fields
+			'manufacturer_level2_value' => 'Manufacturer (Theme Compat)',
+			'year_value' => 'Year (Theme Compat)',
+			'price_value' => 'Price (Theme Compat)',
+			'mileage_value' => 'Mileage (Theme Compat)',
+			'color_value' => 'Color (Theme Compat)',
+			'body_type_value' => 'Body Type (Theme Compat)',
+		);
+	}
+	
+	/**
+	 * Get saved field mappings or return default mappings
+	 * @return array Field mappings
+	 */
+	public function get_field_mappings() {
+		$mappings = $this->get_option('field_mappings', array());
+		
+		// If no mappings exist, return default 1:1 mapping
+		if (empty($mappings)) {
+			$fields = $this->extract_xml_fields();
+			if ($fields !== false) {
+				foreach ($fields as $field) {
+					$mappings[$field] = array(
+						'enabled' => true,
+						'target' => $field
+					);
+				}
+			}
+		}
+		
+		return $mappings;
+	}
+	
+	/**
+	 * Save field mappings
+	 * @param array $mappings Field mappings to save
+	 */
+	public function save_field_mappings($mappings) {
+		$this->update_option('field_mappings', $mappings);
+	}
+	
+	/**
+	 * Check if feed URL has changed
+	 * @param string $new_url New feed URL
+	 * @return bool True if changed, false otherwise
+	 */
+	public function has_feed_url_changed($new_url) {
+		$old_url = $this->get_option('last_feed_url', '');
+		return $old_url !== $new_url && !empty($new_url);
+	}
+	
+	/**
+	 * Check if field mapping is needed
+	 * @return bool True if mapping needed, false otherwise
+	 */
+	public function needs_field_mapping() {
+		$mappings = $this->get_option('field_mappings', array());
+		$feed_url = $this->get_option('xml_file_path', '');
+		$last_feed_url = $this->get_option('last_feed_url', '');
+		
+		// Need mapping if no mappings exist or feed URL changed
+		return empty($mappings) || ($feed_url !== $last_feed_url && !empty($feed_url));
+	}
+	
+	/**
 	 * Render general section description
 	 */
 	public function render_general_section() {
@@ -1008,6 +1187,7 @@ class AutomotiveFeedImport
 			<!-- Tab Navigation -->
 			<h2 class="nav-tab-wrapper">
 				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=general" class="nav-tab <?php echo $active_tab === 'general' ? 'nav-tab-active' : ''; ?>">Feed & Sync</a>
+				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=mapping" class="nav-tab <?php echo $active_tab === 'mapping' ? 'nav-tab-active' : ''; ?>">Field Mapping</a>
 				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=format" class="nav-tab <?php echo $active_tab === 'format' ? 'nav-tab-active' : ''; ?>">Page Templates</a>
 				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=log" class="nav-tab <?php echo $active_tab === 'log' ? 'nav-tab-active' : ''; ?>">Import History</a>
 			</h2>
@@ -1037,6 +1217,7 @@ class AutomotiveFeedImport
 									<button type="button" class="button" onclick="if(confirm('Test your saved inventory link now?')) { window.location.href='<?php echo esc_url( admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=test_connection&_wpnonce=' . wp_create_nonce('test_connection')) ); ?>'; }">Test Inventory Link</button>
 									<button type="button" class="button button-primary" style="margin-left: 8px;" onclick="if(confirm('Run a fresh import now?')) { window.location.href='<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=general&action=run_import&_wpnonce=' . wp_create_nonce('run_import')); ?>'; }">Sync Inventory Now</button>
 									<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&action=download_sample&_wpnonce=' . wp_create_nonce('download_sample')); ?>" class="button" style="margin-left: 8px;">Download Sample Feed</a>
+									<a href="<?php echo admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=mapping'); ?>" class="button" style="margin-left: 8px;">Configure Field Mapping</a>
 								</p>
 							</form>
 							
@@ -1062,6 +1243,114 @@ class AutomotiveFeedImport
 								<?php submit_button(); ?>
 							</form>
 							
+						<?php elseif ($active_tab === 'mapping'): ?>
+							<!-- Field Mapping Tab -->
+							<h2>Field Mapping</h2>
+							<p>Map fields from your XML feed to vehicle post meta fields. Enable or disable fields and select the target meta field from the dropdown for each feed field.</p>
+							
+							<?php
+							// Show notification if redirected after feed URL change
+							if (isset($_GET['feed_changed']) && $_GET['feed_changed'] === '1') {
+								echo '<div class="notice notice-info is-dismissible"><p><strong>Feed URL updated!</strong> Please review and configure your field mappings below, then save them to start importing vehicles.</p></div>';
+							}
+							
+							// Check if feed URL is set
+							$feed_url = $this->get_option('xml_file_path', '');
+							if (empty($feed_url)) {
+								echo '<div class="notice notice-warning"><p><strong>No feed URL configured.</strong> Please configure your inventory link on the <a href="?page=' . $this->plugin_slug . '&tab=general">Feed & Sync</a> tab first.</p></div>';
+							} else {
+								// Extract fields from XML
+								$xml_fields = $this->extract_xml_fields();
+								$current_mappings = $this->get_field_mappings();
+								
+								if ($xml_fields === false) {
+									echo '<div class="notice notice-error"><p><strong>Could not load XML feed.</strong> Please verify your feed URL is correct and accessible.</p></div>';
+								} else {
+									?>
+									<form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+										<input type="hidden" name="action" value="afi_save_field_mappings" />
+										<?php wp_nonce_field('afi_save_field_mappings', 'afi_mapping_nonce'); ?>
+										
+										<div style="background: #f0f0f1; padding: 15px; margin: 20px 0; border-left: 4px solid #0073aa;">
+											<p style="margin: 0;"><strong>💡 Tip:</strong> Found <strong><?php echo count($xml_fields); ?> fields</strong> in your feed. Enable the ones you want to import and select a target meta field from the dropdown for each.</p>
+										</div>
+										
+										<table class="wp-list-table widefat fixed striped" style="margin-top: 20px;">
+											<thead>
+												<tr>
+													<th style="width: 60px;">Enable</th>
+													<th style="width: 40%;">Feed Field (Source)</th>
+													<th style="width: 40%;">Target Meta Field</th>
+													<th style="width: 200px;">Sample Value</th>
+												</tr>
+											</thead>
+											<tbody>
+												<?php
+												// Load first unit to show sample values
+												$units = $this->load_xml();
+												$sample_unit = !empty($units) ? reset($units) : array();
+												
+												// Get available target fields
+												$available_targets = $this->get_available_target_fields();
+												
+												foreach ($xml_fields as $field):
+													$is_enabled = isset($current_mappings[$field]['enabled']) ? $current_mappings[$field]['enabled'] : true;
+													$target_field = isset($current_mappings[$field]['target']) ? $current_mappings[$field]['target'] : $field;
+													$sample_value = isset($sample_unit[$field]) ? $sample_unit[$field] : '';
+													
+													// Truncate long sample values
+													if (strlen($sample_value) > 50) {
+														$sample_value = substr($sample_value, 0, 50) . '...';
+													}
+												?>
+												<tr>
+													<td>
+														<input type="checkbox" name="afi_mapping[<?php echo esc_attr($field); ?>][enabled]" value="1" <?php checked($is_enabled, true); ?> />
+													</td>
+													<td>
+														<strong><?php echo esc_html($field); ?></strong>
+													</td>
+													<td>
+														<select name="afi_mapping[<?php echo esc_attr($field); ?>][target]" class="regular-text" style="width: 100%;">
+															<?php foreach ($available_targets as $target_key => $target_label): ?>
+																<option value="<?php echo esc_attr($target_key); ?>" <?php selected($target_field, $target_key); ?>>
+																	<?php echo esc_html($target_label); ?> (<?php echo esc_html($target_key); ?>)
+																</option>
+															<?php endforeach; ?>
+															<!-- Add current field if not in list -->
+															<?php if (!isset($available_targets[$field])): ?>
+																<option value="<?php echo esc_attr($field); ?>" <?php selected($target_field, $field); ?>>
+																	<?php echo esc_html($field); ?> (custom)
+																</option>
+															<?php endif; ?>
+															<!-- Add selected field if different and not in list -->
+															<?php if ($target_field !== $field && !isset($available_targets[$target_field])): ?>
+																<option value="<?php echo esc_attr($target_field); ?>" selected>
+																	<?php echo esc_html($target_field); ?> (custom)
+																</option>
+															<?php endif; ?>
+														</select>
+													</td>
+													<td>
+														<code style="font-size: 11px; color: #666;"><?php echo esc_html($sample_value); ?></code>
+													</td>
+												</tr>
+												<?php endforeach; ?>
+											</tbody>
+										</table>
+										
+										<?php submit_button('Save Field Mappings'); ?>
+										
+										<p style="margin-top: 20px;">
+											<button type="button" class="button" onclick="if(confirm('Reset all mappings to default (1:1 mapping)?')) { document.getElementById('afi-reset-mappings').value='1'; this.form.submit(); }">Reset to Defaults</button>
+											<input type="hidden" id="afi-reset-mappings" name="afi_reset_mappings" value="0" />
+										</p>
+									</form>
+									<?php
+								}
+							}
+							?>
+							
 						<?php elseif ($active_tab === 'log'): ?>
 							<!-- Import Log Tab -->
 							<h2>Import History</h2>
@@ -1078,6 +1367,7 @@ class AutomotiveFeedImport
 							<h3 style="margin-top: 0;">🚀 Quick Start Guide</h3>
 							<ol>
 								<li><strong>Enter your Inventory Link:</strong> Paste the URL or server path to your XML vehicle feed on the <strong>Feed &amp; Sync</strong> tab.</li>
+								<li><strong>Configure Field Mapping:</strong> After saving your feed URL, map which fields to import on the <strong>Field Mapping</strong> tab.</li>
 								<li><strong>Choose how often to sync:</strong> Pick a schedule that matches how often your provider updates the feed, then click <strong>Save Changes</strong>.</li>
 								<li><strong>Sync &amp; review:</strong> Click <strong>Sync Inventory Now</strong> to run your first import, then review your vehicles under the <strong>Vehicles</strong> menu.</li>
 							</ol>
@@ -1238,6 +1528,21 @@ class AutomotiveFeedImport
 		}
 		
 		if (!isset($_GET['action'])) {
+			// Check if we should redirect to field mapping after settings save
+			if (isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true') {
+				$current_feed_url = $this->get_option('xml_file_path', '');
+				$last_feed_url = $this->get_option('last_feed_url', '');
+				
+				// If feed URL changed and not empty, redirect to mapping tab
+				if (!empty($current_feed_url) && $current_feed_url !== $last_feed_url) {
+					// Update the last feed URL
+					$this->update_option('last_feed_url', $current_feed_url);
+					
+					// Redirect to mapping tab
+					wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=mapping&feed_changed=1'));
+					exit;
+				}
+			}
 			return;
 		}
 		
@@ -1292,6 +1597,61 @@ class AutomotiveFeedImport
 				exit;
 			}
 		}
+	}
+	
+	/**
+	 * Handle field mapping save
+	 */
+	public function handle_field_mapping_save() {
+		// Verify nonce
+		if (!isset($_POST['afi_mapping_nonce']) || !wp_verify_nonce($_POST['afi_mapping_nonce'], 'afi_save_field_mappings')) {
+			wp_die('Security check failed');
+		}
+		
+		// Check user permissions
+		if (!current_user_can('manage_options')) {
+			wp_die('Unauthorized access');
+		}
+		
+		// Check if reset was requested
+		if (isset($_POST['afi_reset_mappings']) && $_POST['afi_reset_mappings'] === '1') {
+			// Delete existing mappings to trigger default generation
+			delete_option($this->plugin_slug . '_field_mappings');
+			
+			set_transient('afi_admin_notice', array(
+				'type' => 'success',
+				'message' => 'Field mappings reset to defaults successfully.'
+			), 30);
+			
+			wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=mapping'));
+			exit;
+		}
+		
+		// Process mappings
+		$mappings = array();
+		if (isset($_POST['afi_mapping']) && is_array($_POST['afi_mapping'])) {
+			foreach ($_POST['afi_mapping'] as $source_field => $config) {
+				$source_field = sanitize_text_field($source_field);
+				$target_field = isset($config['target']) ? sanitize_text_field($config['target']) : $source_field;
+				$enabled = isset($config['enabled']) && $config['enabled'] === '1';
+				
+				$mappings[$source_field] = array(
+					'enabled' => $enabled,
+					'target' => $target_field
+				);
+			}
+		}
+		
+		// Save mappings
+		$this->save_field_mappings($mappings);
+		
+		set_transient('afi_admin_notice', array(
+			'type' => 'success',
+			'message' => 'Field mappings saved successfully. Import will now use these mappings.'
+		), 30);
+		
+		wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug . '&tab=mapping'));
+		exit;
 	}
 	
 	/**
@@ -1523,6 +1883,7 @@ add_action('save_post_vehicles', array($afi, 'save_vehicle_meta'));
 add_action('wp_ajax_afi_dismiss_banner', array($afi, 'dismiss_banner'));
 add_action('wp_ajax_afi_browse_files', array($afi, 'ajax_browse_files'));
 add_action('admin_enqueue_scripts', array($afi, 'enqueue_admin_scripts'));
+add_action('admin_post_afi_save_field_mappings', array($afi, 'handle_field_mapping_save'));
 
 // Filters
 add_filter('cron_schedules', array($afi, 'define_interval'));
