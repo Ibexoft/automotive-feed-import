@@ -451,7 +451,7 @@ class AutomotiveFeedImport
 				$parts = preg_split('/[,\|\s]+/', $unit[$field]);
 				foreach ($parts as $url) {
 					$url = trim($url);
-					if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL)) {
+					if ($url !== '' && preg_match('#^https?://#i', $url)) {
 						$image_urls[] = esc_url_raw($url);
 					}
 				}
@@ -463,7 +463,7 @@ class AutomotiveFeedImport
 			if (!is_string($value) || $value === '') {
 				continue;
 			}
-			if (preg_match('/^(image|photo)[_\-]?\d*$/i', (string) $key) && filter_var($value, FILTER_VALIDATE_URL)) {
+			if (preg_match('/^(image|photo)[_\-]?\d*$/i', (string) $key) && preg_match('#^https?://#i', $value)) {
 				$image_urls[] = esc_url_raw($value);
 			}
 		}
