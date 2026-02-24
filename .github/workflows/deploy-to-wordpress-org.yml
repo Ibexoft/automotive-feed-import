@@ -1,0 +1,40 @@
+name: Deploy to WordPress.org
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org Plugin Repository
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build plugin
+      run: |
+        # Install any dependencies if needed
+        # For this plugin, we just need to prepare files
+        echo "Preparing plugin files for deployment..."
+        
+    - name: WordPress Plugin Deploy
+      id: deploy
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      env:
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SLUG: automotive-feed-import
+      with:
+        generate-zip: true
+
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ${{ steps.deploy.outputs.zip-path }}
+        asset_name: automotive-feed-import.zip
+        asset_content_type: application/zip

@@ -1,7 +1,7 @@
 === Automotive Inventory Importer – Sync Car Dealer Feeds ===
 Contributors: jawaid
 Donate link: https://www.ibexoft.com
-Tags: car dealer, automotive, inventory, vehicle, car listing
+Tags: car dealer, automotive, inventory, import, car listing
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0

@@ -1,0 +1,40 @@
+# Files and directories to exclude from WordPress.org SVN deployment
+
+# Version control
+.git
+.github
+.gitignore
+.gitattributes
+
+# Documentation (development only)
+.github/DEPLOYMENT.md
+.github/copilot-instructions.md
+
+# WordPress Playground
+.wordpress-org
+
+# Development files
+*.log
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+
+# Build files (if you add build process later)
+node_modules
+package.json
+package-lock.json
+webpack.config.js
+composer.json
+composer.lock
+vendor
+
+# Testing (if added later)
+tests
+phpunit.xml
+.phpunit.result.cache
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+circle.yml
