@@ -179,14 +179,6 @@ class AutomotiveFeedImport
 			return;
 		}
 
-		// Only on Plugins page or Dashboard (guard if get_current_screen not available)
-		if (function_exists('get_current_screen')) {
-			$screen = get_current_screen();
-			if ($screen && $screen->id !== 'plugins' && $screen->id !== 'dashboard') {
-				return;
-			}
-		}
-
 		?>
 		<div class="notice notice-info is-dismissible" data-dismiss-type="activation">
 			<p style="font-size: 16px;">
@@ -662,6 +654,10 @@ class AutomotiveFeedImport
 		}
 		
 		$this->log("Import complete: {$created} created, {$updated} updated");
+		
+		// Remove activation banner after first successful import
+		delete_transient('afi_activation_notice');
+		
 		return array('created' => $created, 'updated' => $updated, 'success' => true);
 	}
 
