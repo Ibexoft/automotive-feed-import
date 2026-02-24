@@ -400,6 +400,161 @@ class AutomotiveFeedImport
 			}
 		}
 	}
+
+	/**
+	 * Import images from feed into Media Library and attach to vehicle
+	 */
+	private function process_images($post_id, $unit)
+	{
+		$image_urls = array();
+
+		// Combined list fields (comma / pipe / whitespace separated)
+		foreach (array('image_urls', 'images', 'photos') as $field) {
+			if (!empty($unit[$field]) && is_string($unit[$field])) {
+				$parts = preg_split('/[,\|\s]+/', $unit[$field]);
+				foreach ($parts as $url) {
+					$url = trim($url);
+					if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL)) {
+						$image_urls[] = esc_url_raw($url);
+					}
+				}
+			}
+		}
+
+		// Individual image/photo fields: image1, image_2, photo3, etc.
+		foreach ($unit as $key => $value) {
+			if (!is_string($value) || $value === '') {
+				continue;
+			}
+			if (preg_match('/^(image|photo)[_\-]?\d*$/i', (string) $key) && filter_var($value, FILTER_VALIDATE_URL)) {
+				$image_urls[] = esc_url_raw($value);
+			}
+		}
+
+		$image_urls = array_values(array_unique($image_urls));
+
+		if (empty($image_urls)) {
+			// No images in feed: ensure placeholder is set if needed
+			if (!has_post_thumbnail($post_id)) {
+				$placeholder_id = $this->ensure_placeholder_attachment();
+				if ($placeholder_id) {
+					set_post_thumbnail($post_id, $placeholder_id);
+				}
+			}
+			return;
+		}
+
+		// Avoid re-importing the same URLs
+		$already_imported = get_post_meta($post_id, '_afi_imported_image_urls', true);
+		if (!is_array($already_imported)) {
+			$already_imported = array();
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$new_imported = $already_imported;
+		$index        = 0;
+
+		foreach ($image_urls as $url) {
+			if (in_array($url, $already_imported, true)) {
+				$index++;
+				continue;
+			}
+
+			$attachment_id = media_sideload_image($url, $post_id, null, 'id');
+
+			if (is_wp_error($attachment_id)) {
+				$this->log("Failed to import image {$url} for post {$post_id}: " . $attachment_id->get_error_message(), true);
+				$index++;
+				continue;
+			}
+
+			$new_imported[] = $url;
+			// First imported image becomes featured image if none set yet
+			if ($index === 0 && !has_post_thumbnail($post_id)) {
+				set_post_thumbnail($post_id, $attachment_id);
+			}
+
+			$index++;
+		}
+
+		update_post_meta($post_id, '_afi_imported_image_urls', array_values(array_unique($new_imported)));
+
+		// If, for some reason, no thumbnail exists after processing, set placeholder
+		if (!has_post_thumbnail($post_id)) {
+			$placeholder_id = $this->ensure_placeholder_attachment();
+			if ($placeholder_id) {
+				set_post_thumbnail($post_id, $placeholder_id);
+			}
+		}
+	}
+
+	/**
+	 * Ensure a reusable placeholder image exists in Media Library and return its attachment ID
+	 */
+	private function ensure_placeholder_attachment()
+	{
+		// Try cached attachment ID first
+		$cached_id = $this->get_option('placeholder_attachment_id');
+		if ($cached_id) {
+			$cached_id = (int) $cached_id;
+			if ($cached_id > 0 && get_post($cached_id)) {
+				return $cached_id;
+			}
+		}
+
+		$placeholder_path = plugin_dir_path(__FILE__) . 'assets/car_placeholder.png';
+		if (!file_exists($placeholder_path)) {
+			$this->log('Placeholder image not found at ' . $placeholder_path, true);
+			return 0;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$upload_dir = wp_upload_dir();
+		if (!empty($upload_dir['error'])) {
+			$this->log('Failed to access upload directory for placeholder image: ' . $upload_dir['error'], true);
+			return 0;
+		}
+
+		$filename   = 'car_placeholder.png';
+		$dest_path  = trailingslashit($upload_dir['path']) . $filename;
+		$dest_url   = trailingslashit($upload_dir['url']) . $filename;
+
+		// Copy file into current uploads folder if it does not exist yet
+		if (!file_exists($dest_path)) {
+			if (!@copy($placeholder_path, $dest_path)) {
+				$this->log('Failed to copy placeholder image into uploads directory.', true);
+				return 0;
+			}
+		}
+
+		$filetype = wp_check_filetype($filename, null);
+		$attachment = array(
+			'guid'           => $dest_url,
+			'post_mime_type' => $filetype['type'],
+			'post_title'     => 'Vehicle Placeholder Image',
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		);
+
+		$attach_id = wp_insert_attachment($attachment, $dest_path);
+		if (is_wp_error($attach_id)) {
+			$this->log('Failed to create placeholder attachment: ' . $attach_id->get_error_message(), true);
+			return 0;
+		}
+
+		$attach_data = wp_generate_attachment_metadata($attach_id, $dest_path);
+		wp_update_attachment_metadata($attach_id, $attach_data);
+
+		$this->update_option('placeholder_attachment_id', $attach_id);
+
+		return (int) $attach_id;
+	}
 	
 	/**
 	 * Fetches the data from xml then add/update database
@@ -447,6 +602,7 @@ class AutomotiveFeedImport
 			// now add/update the plugin data against the listing
 			if ($post_id) {
 				$this->update_inventory($post_id, $unit);
+				$this->process_images($post_id, $unit);
 			}
 		}
 		
