@@ -1787,9 +1787,11 @@ class AutomotiveFeedImport
 			
 			$custom_fields = get_post_custom($post->ID);
 			
-			$vehicle_data = '<div class="vehicle-details" style="background: #f9f9f9; padding: 20px; margin: 20px 0; border: 1px solid #ddd;">';
-			$vehicle_data .= '<h3 style="margin-top: 0;">Vehicle Specifications</h3>';
-			$vehicle_data .= '<table style="width: 100%; border-collapse: collapse;">';
+			$vehicle_data = '<div class="vehicle-details">';
+			$vehicle_data .= '<h3>Vehicle Specifications</h3>';
+			$vehicle_data .= '<table class="vehicle-specs-table">';
+			$vehicle_data .= '<thead><tr><th>Specification</th><th>Details</th></tr></thead>';
+			$vehicle_data .= '<tbody>';
 			
 			$fields = array(
 				'stock_number' => 'Stock Number',
@@ -1809,13 +1811,14 @@ class AutomotiveFeedImport
 			foreach ($fields as $key => $label) {
 				$value = $custom_fields[$key][0] ?? '';
 				if (!empty($value)) {
-					$vehicle_data .= '<tr style="border-bottom: 1px solid #e0e0e0;">';
-					$vehicle_data .= '<td style="padding: 10px; font-weight: 600; width: 30%;">' . esc_html($label) . '</td>';
-					$vehicle_data .= '<td style="padding: 10px;">' . esc_html($value) . '</td>';
+					$vehicle_data .= '<tr>';
+					$vehicle_data .= '<td>' . esc_html($label) . '</td>';
+					$vehicle_data .= '<td>' . esc_html($value) . '</td>';
 					$vehicle_data .= '</tr>';
 				}
 			}
 			
+			$vehicle_data .= '</tbody>';
 			$vehicle_data .= '</table>';
 			$vehicle_data .= '</div>';
 			
@@ -1823,6 +1826,152 @@ class AutomotiveFeedImport
 		}
 		
 		return $content;
+	}
+	
+	/**
+	 * Display vehicle info in archive/listing pages
+	 */
+	public function display_vehicle_archive($content) {
+		if (is_post_type_archive('vehicles') || is_tax()) {
+			if (in_the_loop() && is_main_query()) {
+				global $post;
+				$custom_fields = get_post_custom($post->ID);
+				
+				$vehicle_card = '<div class="vehicle-archive-card">';
+				$vehicle_card .= '<div class="vehicle-info">';
+				
+				// Key info
+				$manufacturer = $custom_fields['manufacturer'][0] ?? '';
+				$model = $custom_fields['model'][0] ?? '';
+				$year = $custom_fields['model_year'][0] ?? '';
+				$price = $custom_fields['special_web_price'][0] ?? '';
+				$mileage = $custom_fields['mileage'][0] ?? '';
+				$color = $custom_fields['exterior_color'][0] ?? '';
+				$designation = $custom_fields['designation'][0] ?? '';
+				
+				if ($price) {
+					$vehicle_card .= '<div class="vehicle-price">$' . esc_html(number_format((float)$price)) . '</div>';
+				}
+				
+				$vehicle_card .= '<div class="vehicle-quick-specs">';
+				if ($year) $vehicle_card .= '<span class="spec-item"><strong>Year:</strong> ' . esc_html($year) . '</span>';
+				if ($mileage) $vehicle_card .= '<span class="spec-item"><strong>Mileage:</strong> ' . esc_html(number_format((float)$mileage)) . ' mi</span>';
+				if ($color) $vehicle_card .= '<span class="spec-item"><strong>Color:</strong> ' . esc_html($color) . '</span>';
+				if ($designation) $vehicle_card .= '<span class="spec-item"><strong>Condition:</strong> ' . esc_html($designation) . '</span>';
+				$vehicle_card .= '</div>';
+				
+				$vehicle_card .= '<a href="' . get_permalink() . '" class="view-details-btn">View Details →</a>';
+				$vehicle_card .= '</div>'; // Close vehicle-info
+				$vehicle_card .= '</div>'; // Close vehicle-archive-card
+				
+				return $vehicle_card;
+			}
+		}
+		return $content;
+	}
+	
+	/**
+	 * Enqueue frontend styles for vehicle specifications and archive
+	 */
+	public function enqueue_frontend_styles() {
+		if (is_singular('vehicles') || is_post_type_archive('vehicles') || is_tax()) {
+			wp_add_inline_style('wp-block-library', '
+				/* Professional Dealer Table Styling */
+				.vehicle-specs-table {
+					width: 100%;
+					border-collapse: collapse;
+					margin: 20px 0;
+					font-family: sans-serif;
+					box-shadow: 0 0 20px rgba(0,0,0,0.1);
+				}
+				.vehicle-specs-table th {
+					background-color: #0073aa;
+					color: #ffffff;
+					text-align: left;
+					padding: 12px 15px;
+				}
+				.vehicle-specs-table td {
+					padding: 12px 15px;
+					border-bottom: 1px solid #dddddd;
+				}
+				.vehicle-specs-table tbody tr:nth-of-type(even) {
+					background-color: #f3f3f3;
+				}
+				.vehicle-details h3 {
+					margin-top: 30px;
+					margin-bottom: 10px;
+					font-size: 24px;
+				}
+				
+				/* Vehicle Archive/Listing Grid Styling */
+				.vehicle-archive-card {
+					background: #ffffff;
+					border: 1px solid #e0e0e0;
+					border-radius: 8px;
+					overflow: hidden;
+					box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+					transition: transform 0.3s ease, box-shadow 0.3s ease;
+					margin-bottom: 30px;
+				}
+				.vehicle-archive-card:hover {
+					transform: translateY(-5px);
+					box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+				}
+				.vehicle-archive-card .vehicle-info {
+					padding: 20px;
+				}
+				.vehicle-archive-card .vehicle-price {
+					font-size: 28px;
+					font-weight: bold;
+					color: #0073aa;
+					margin-bottom: 15px;
+				}
+				.vehicle-archive-card .vehicle-quick-specs {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 15px;
+					margin-bottom: 20px;
+					padding-bottom: 15px;
+					border-bottom: 1px solid #e0e0e0;
+				}
+				.vehicle-archive-card .spec-item {
+					font-size: 14px;
+					color: #555;
+				}
+				.vehicle-archive-card .spec-item strong {
+					color: #333;
+				}
+				.vehicle-archive-card .view-details-btn {
+					display: inline-block;
+					background: #0073aa;
+					color: #ffffff;
+					padding: 10px 20px;
+					border-radius: 4px;
+					text-decoration: none;
+					transition: background 0.3s ease;
+				}
+				.vehicle-archive-card .view-details-btn:hover {
+					background: #005a87;
+					color: #ffffff;
+				}
+				
+				/* Grid layout for archive pages */
+				@media (min-width: 768px) {
+					.post-type-archive-vehicles .site-main,
+					.tax-vehicles .site-main {
+						display: grid;
+						grid-template-columns: repeat(2, 1fr);
+						gap: 30px;
+					}
+				}
+				@media (min-width: 1024px) {
+					.post-type-archive-vehicles .site-main,
+					.tax-vehicles .site-main {
+						grid-template-columns: repeat(3, 1fr);
+					}
+				}
+			');
+		}
 	}
 	
 	/**
@@ -1884,10 +2033,12 @@ add_action('wp_ajax_afi_dismiss_banner', array($afi, 'dismiss_banner'));
 add_action('wp_ajax_afi_browse_files', array($afi, 'ajax_browse_files'));
 add_action('admin_enqueue_scripts', array($afi, 'enqueue_admin_scripts'));
 add_action('admin_post_afi_save_field_mappings', array($afi, 'handle_field_mapping_save'));
+add_action('wp_enqueue_scripts', array($afi, 'enqueue_frontend_styles'));
 
 // Filters
 add_filter('cron_schedules', array($afi, 'define_interval'));
 add_filter('the_content', array($afi, 'display_vehicle_frontend'));
+add_filter('the_content', array($afi, 'display_vehicle_archive'));
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($afi, 'add_plugin_action_links'));
 
 ?>
