@@ -202,6 +202,24 @@ class AutomotiveFeedImport
 	}
 	
 	/**
+	 * Display transient admin notices (used after redirects)
+	 */
+	public function display_transient_notices() {
+		$notice = get_transient('afi_admin_notice');
+		if ($notice) {
+			$type = isset($notice['type']) ? $notice['type'] : 'info';
+			$message = isset($notice['message']) ? $notice['message'] : '';
+			
+			if ($message) {
+				echo '<div class="notice notice-' . esc_attr($type) . ' is-dismissible"><p>' . wp_kses_post($message) . '</p></div>';
+			}
+			
+			// Delete transient so it only shows once
+			delete_transient('afi_admin_notice');
+		}
+	}
+	
+	/**
 	 * Uninitialize plugin
 	 */
 	public function uninit()
@@ -1240,9 +1258,10 @@ class AutomotiveFeedImport
 		if ($action === 'clear_log' && check_admin_referer('clear_log')) {
 			if (file_exists($this->log_file)) {
 				file_put_contents($this->log_file, '');
-				add_action('admin_notices', function() {
-					echo '<div class="notice notice-success is-dismissible"><p>Log cleared successfully.</p></div>';
-				});
+				set_transient('afi_admin_notice', array(
+					'type' => 'success',
+					'message' => 'Log cleared successfully.'
+				), 30);
 			}
 			wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug . $tab));
 			exit;
@@ -1252,13 +1271,15 @@ class AutomotiveFeedImport
 		if ($action === 'run_import' && check_admin_referer('run_import')) {
 			$result = $this->update_data();
 			if ($result && $result['success']) {
-				add_action('admin_notices', function() use ($result) {
-					echo '<div class="notice notice-success is-dismissible"><p><strong>Import Successful!</strong> ' . $result['created'] . ' vehicles created, ' . $result['updated'] . ' updated.</p></div>';
-				});
+				set_transient('afi_admin_notice', array(
+					'type' => 'success',
+					'message' => '<strong>Import Successful!</strong> ' . $result['created'] . ' vehicles created, ' . $result['updated'] . ' updated.'
+				), 30);
 			} else {
-				add_action('admin_notices', function() {
-					echo '<div class="notice notice-error is-dismissible"><p><strong>Import Failed!</strong> Check the log below for details.</p></div>';
-				});
+				set_transient('afi_admin_notice', array(
+					'type' => 'error',
+					'message' => '<strong>Import Failed!</strong> Check the log below for details.'
+				), 30);
 			}
 			wp_redirect(admin_url('options-general.php?page=' . $this->plugin_slug . $tab));
 			exit;
@@ -1500,6 +1521,7 @@ add_action('admin_init', array($afi, 'register_settings'));
 add_action('admin_init', array($afi, 'handle_admin_actions'));
 add_action('admin_menu', array($afi, 'add_settings_page'));
 add_action('admin_notices', array($afi, 'display_activation_notice'));
+add_action('admin_notices', array($afi, 'display_transient_notices'));
 add_action('update_xml_event', array($afi, 'update_data'));
 add_action('save_post_vehicles', array($afi, 'save_vehicle_meta'));
 add_action('wp_ajax_afi_dismiss_banner', array($afi, 'dismiss_banner'));
