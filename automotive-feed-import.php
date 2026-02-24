@@ -264,27 +264,64 @@ class AutomotiveFeedImport
 	 */
 	public function load_xml()
 	{
-		// Check if file exists
-		if (!file_exists($this->xml_file)) {
-			$this->log("XML file not found: {$this->xml_file}", true);
-			return false;
-		}
-		
-		// load the xml file
-		$xml = simplexml_load_file($this->xml_file);
+		// Handle remote URL (http/https)
+		if (preg_match('#^https?://#i', $this->xml_file)) {
+			$response = wp_remote_get($this->xml_file, array('timeout' => 30));
+			
+			if (is_wp_error($response)) {
+				$this->log("Failed to fetch remote XML: " . $response->get_error_message(), true);
+				return false;
+			}
+			
+			$code = wp_remote_retrieve_response_code($response);
+			if ($code < 200 || $code >= 300) {
+				$this->log("Remote XML returned error code: {$code}", true);
+				return false;
+			}
+			
+			$body = wp_remote_retrieve_body($response);
+			if (empty($body)) {
+				$this->log("Remote XML file is empty: {$this->xml_file}", true);
+				return false;
+			}
+			
+			libxml_use_internal_errors(true);
+			$xml = simplexml_load_string($body);
+			
+			if (!$xml) {
+				$error_msg = "Failed loading XML from {$this->xml_file}";
+				$this->log($error_msg, true);
+				
+				foreach(libxml_get_errors() as $error) {
+					$this->log("XML Error: " . $error->message, true);
+				}
+				libxml_clear_errors();
+				
+				return false;
+			}
+		} else {
+			// Handle local file path
+			if (!file_exists($this->xml_file)) {
+				$this->log("XML file not found: {$this->xml_file}", true);
+				return false;
+			}
+			
+			// load the xml file
+			$xml = simplexml_load_file($this->xml_file);
 
-		if (!$xml) 
-		{
-		    $error_msg = "Failed loading XML from {$this->xml_file}";
-		    $this->log($error_msg, true);
-		    
-		    foreach(libxml_get_errors() as $error)
-		    {
-		        $this->log("XML Error: " . $error->message, true);
+			if (!$xml) 
+			{
+			    $error_msg = "Failed loading XML from {$this->xml_file}";
+			    $this->log($error_msg, true);
+			    
+			    foreach(libxml_get_errors() as $error)
+			    {
+			        $this->log("XML Error: " . $error->message, true);
+			    }
+			        
+			    return false;
 		    }
-		        
-		    return false;
-	    }
+		}
 	    
 		$units = array();
 		
