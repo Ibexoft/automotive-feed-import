@@ -3,7 +3,7 @@
 Plugin Name: Automotive Inventory Importer – Sync Car Dealer Feeds
 Plugin URI: https://www.ibexoft.com/product/automotive-feed-import/
 Description: Automatically update your car inventory on your website. No manual entry needed. Stop wasting hours uploading cars one by one.
-Version: 2.1
+Version: 2.2
 Author: Muhammad Jawaid Shamshad - Ibexoft
 Author URI: https://ibexoft.com
 License: GNU Public License

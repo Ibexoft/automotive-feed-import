@@ -5,7 +5,7 @@ Tags: car dealer, automotive, inventory, vehicle, car listing
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.1
+Stable tag: 2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,9 +67,20 @@ We're constantly improving and your feedback is invaluable. Take our [quick 2-mi
 
 1. Settings page
 2. Vehicle edit screen showing imported and editable fields
-3. Import log viewer with detailed operation history
+3. Import history viewer with detailed operation history
+4. Frontend listing
+5. Frontend post
+6. Field mapping between feed and post
+7. Page template setting
 
 == Changelog ==
+
+= 2.2 =
+* Frontend listing improvements
+* Users can now map fields between feed and post
+* Several UX improvements
+* Import images, set featured image, and display them in post
+* Users can now import remote feeds
 
 = 2.1 =
 * Fixed version mismatch
