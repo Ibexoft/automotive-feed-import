@@ -1185,8 +1185,6 @@ class AutomotiveFeedImport
 		<div class="wrap">
 			<h1>Automotive Inventory Importer Settings</h1>
 			
-			<?php $this->render_survey_banner(); ?>
-			
 			<!-- Tab Navigation -->
 			<h2 class="nav-tab-wrapper">
 				<a href="?page=<?php echo $this->plugin_slug; ?>&tab=general" class="nav-tab <?php echo $active_tab === 'general' ? 'nav-tab-active' : ''; ?>">Feed & Sync</a>
@@ -1689,16 +1687,32 @@ class AutomotiveFeedImport
 	}
 	
 	/**
-	 * Render survey banner
+	 * Render survey banner (dashboard only, after first import)
 	 */
 	private function render_survey_banner() {
+		// Only show if an import has actually been completed successfully
+		$import_count = get_option('afi_total_imports', 0);
+		if ($import_count < 1) {
+			return;
+		}
+		
+		// Only show on dashboard
+		$screen = get_current_screen();
+		if (!$screen || $screen->id !== 'dashboard') {
+			return;
+		}
+		
+		// Check if already dismissed
 		$dismissed = get_user_meta(get_current_user_id(), 'afi_survey_dismissed', true);
 		if ($dismissed) {
 			return;
 		}
 		?>
-		<div class="notice notice-info is-dismissible" data-dismiss-type="survey">
-			<p><strong>Help us improve!</strong> Take our quick 2-minute survey: <a href="<?php echo esc_url($this->survey_url); ?>" target="_blank">Take Survey</a></p>
+		<div class="notice notice-info is-dismissible" data-dismiss-type="survey" style="border-left-color: #00a0d2;">
+			<p style="font-size: 15px;">📋 <strong>Making your vehicle imports easier?</strong> 
+			Help shape the future of <em>Automotive Inventory Importer</em>! Share your experience in our quick 2-minute survey. Your insights help us build features you actually need.
+			<a href="<?php echo esc_url($this->survey_url); ?>" target="_blank" class="button button-primary" style="margin-left: 10px;">Take Survey</a>
+			</p>
 		</div>
 		<?php
 	}
@@ -2047,6 +2061,7 @@ add_action('admin_menu', array($afi, 'add_settings_page'));
 add_action('admin_notices', array($afi, 'display_activation_notice'));
 add_action('admin_notices', array($afi, 'display_transient_notices'));
 add_action('admin_notices', array($afi, 'render_feedback_banner'));
+add_action('admin_notices', array($afi, 'render_survey_banner'));
 add_action('update_xml_event', array($afi, 'update_data'));
 add_action('save_post_vehicles', array($afi, 'save_vehicle_meta'));
 add_action('wp_ajax_afi_dismiss_banner', array($afi, 'dismiss_banner'));
