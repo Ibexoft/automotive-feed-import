@@ -3,7 +3,7 @@
 Plugin Name: Automotive Inventory Importer – Sync Car Dealer Feeds
 Plugin URI: https://www.ibexoft.com/product/automotive-feed-import/
 Description: Automatically update your car inventory on your website. No manual entry needed. Stop wasting hours uploading cars one by one.
-Version: 2.2.2
+Version: 2.2.3
 Author: Muhammad Jawaid Shamshad - Ibexoft
 Author URI: https://ibexoft.com
 License: GNU Public License
@@ -693,6 +693,10 @@ class AutomotiveFeedImport
 		// Remove activation banner after first successful import
 		delete_transient('afi_activation_notice');
 		
+		// Track successful imports for review notice
+		$import_count = get_option('afi_total_imports', 0);
+		update_option('afi_total_imports', $import_count + 1);
+		
 		return array('created' => $created, 'updated' => $updated, 'success' => true);
 	}
 
@@ -1181,7 +1185,6 @@ class AutomotiveFeedImport
 		<div class="wrap">
 			<h1>Automotive Inventory Importer Settings</h1>
 			
-			<?php $this->render_feedback_banner(); ?>
 			<?php $this->render_survey_banner(); ?>
 			
 			<!-- Tab Navigation -->
@@ -1655,16 +1658,32 @@ class AutomotiveFeedImport
 	}
 	
 	/**
-	 * Render feedback banner
+	 * Render feedback banner (dashboard only, after first import)
 	 */
 	private function render_feedback_banner() {
+		// Only show if an import has actually been completed successfully
+		$import_count = get_option('afi_total_imports', 0);
+		if ($import_count < 1) {
+			return;
+		}
+		
+		// Only show on dashboard
+		$screen = get_current_screen();
+		if (!$screen || $screen->id !== 'dashboard') {
+			return;
+		}
+		
+		// Check if already dismissed
 		$dismissed = get_user_meta(get_current_user_id(), 'afi_feedback_dismissed', true);
 		if ($dismissed) {
 			return;
 		}
 		?>
-		<div class="notice notice-info is-dismissible" data-dismiss-type="feedback">
-			<p><strong>Enjoying Automotive Inventory Importer?</strong> Please consider leaving a review on the <a href="https://wordpress.org/plugins/automotive-feed-import/" target="_blank">WordPress Plugin Directory</a>. Your feedback helps us improve!</p>
+		<div class="notice notice-success is-dismissible" data-dismiss-type="feedback" style="border-left-color: #ffb900;">
+			<p style="font-size: 15px;">🚗 <strong>Is your inventory looking good?</strong> 
+			If <em>Automotive Inventory Importer</em> saved you time today, would you mind leaving a quick review? It helps us keep the plugin free!
+			<a href="https://wordpress.org/support/plugin/automotive-feed-import/reviews/#new-post" target="_blank" class="button button-secondary" style="margin-left: 10px;">Leave a Review ★★★★★</a>
+			</p>
 		</div>
 		<?php
 	}
@@ -2027,6 +2046,7 @@ add_action('admin_init', array($afi, 'handle_admin_actions'));
 add_action('admin_menu', array($afi, 'add_settings_page'));
 add_action('admin_notices', array($afi, 'display_activation_notice'));
 add_action('admin_notices', array($afi, 'display_transient_notices'));
+add_action('admin_notices', array($afi, 'render_feedback_banner'));
 add_action('update_xml_event', array($afi, 'update_data'));
 add_action('save_post_vehicles', array($afi, 'save_vehicle_meta'));
 add_action('wp_ajax_afi_dismiss_banner', array($afi, 'dismiss_banner'));
