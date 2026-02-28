@@ -3,7 +3,7 @@
 Plugin Name: Automotive Inventory Importer – Sync Car Dealer Feeds
 Plugin URI: https://www.ibexoft.com/product/automotive-feed-import/
 Description: Automatically update your car inventory on your website. No manual entry needed. Stop wasting hours uploading cars one by one.
-Version: 2.2.3
+Version: 2.2.4
 Author: Muhammad Jawaid Shamshad - Ibexoft
 Author URI: https://ibexoft.com
 License: GNU Public License
@@ -1658,7 +1658,7 @@ class AutomotiveFeedImport
 	/**
 	 * Render feedback banner (dashboard only, after first import)
 	 */
-	private function render_feedback_banner() {
+	public function render_feedback_banner() {
 		// Only show if an import has actually been completed successfully
 		$import_count = get_option('afi_total_imports', 0);
 		if ($import_count < 1) {
@@ -1689,7 +1689,7 @@ class AutomotiveFeedImport
 	/**
 	 * Render survey banner (dashboard only, after first import)
 	 */
-	private function render_survey_banner() {
+	public function render_survey_banner() {
 		// Only show if an import has actually been completed successfully
 		$import_count = get_option('afi_total_imports', 0);
 		if ($import_count < 1) {
